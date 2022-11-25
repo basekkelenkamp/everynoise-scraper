@@ -61,11 +61,13 @@ if __name__ == "__main__":
 
     print(f"\nGenres loaded into g_df. Found {len(g_df)} total genres.\n")
 
-    random_genre = g_df.iloc[randint(0, len(g_df) - 1)]
+    for i in range(5):
+        random_genre = g_df.iloc[randint(0, len(g_df) - 1)]
 
-    print(f"genre found: {random_genre['genre']}\n")
+        print(f"\ngenre found: {random_genre['genre']}")
 
-    artists_df = scrape_genre_artists(random_genre)
-    artists_df.index.name = random_genre['genre']
-    
-    breakpoint()
+        artists_df = scrape_genre_artists(random_genre)
+        artists_df.index.name = random_genre['genre']
+        random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
+
+        print(f"{random_artist['artist']}. Listen: {random_artist['spotify_link']}")
