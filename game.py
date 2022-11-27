@@ -40,7 +40,7 @@ if __name__ == "__main__":
             elif song_points >= 2:
                 song_points -= 2
 
-        if split_answer == split_guess:
+        if sorted(split_answer) == sorted(split_guess):
             song_points = 50
 
         points += song_points
