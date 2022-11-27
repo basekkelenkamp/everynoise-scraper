@@ -220,10 +220,18 @@ brotli = ["brotlicffi (>=0.8.0)", "brotli (>=1.0.9)", "brotlipy (>=0.6.0)"]
 secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "urllib3-secure-extra", "ipaddress"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
+[[package]]
+name = "wordsegment"
+version = "1.3.1"
+description = "English word segmentation."
+category = "main"
+optional = false
+python-versions = "*"
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "3e11dbd4f86c6ba3ceba4106116071263cbc4f671ba0c65ad3d596e43c166f09"
+content-hash = "aa2932dd0399fdf9372072cf6b3fbf88d06e261ec9d32ca5d74dfac9752643c5"
 
 [metadata.files]
 beautifulsoup4 = [
@@ -267,3 +275,4 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 urllib3 = []
+wordsegment = []
