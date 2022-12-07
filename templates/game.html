@@ -1,14 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>Game started</h2>
-<p>Round: <b>{{ round_number }}</b></p>
-<p>Points: <b>{{ points }}</b></p>
-<p>url: {{ artist_url }}</p>
+    <h2>Game started</h2>
+    <p>Round: <b>{{ round_number }}</b></p>
+    <p>Points: <b>{{ points_total }}</b></p>
 
-<form method="POST" action="{{ url_for('genre_guesser') }}">
-    <input type="text" id="genre_guess" name="genre_guess" placeholder="guess the genre..">
-  <input type="submit" name="submit_button" value="guess"/>
-</form>
+    <div>
+        <a href="{{ artist_url }}" target="_blank">Click here to listen</a>
+
+        <form method="POST" action="{{ url_for('genre_guesser') }}">
+            <input type="text" id="genre_guess" name="genre_guess" placeholder="guess the genre..">
+            <input type="submit" name="submit_button" value="guess"/>
+        </form>
+    </div>
 
 {% endblock content %}

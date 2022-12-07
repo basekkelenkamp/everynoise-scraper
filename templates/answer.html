@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h2>Answer</h2>
+    <h4>Round: <b>{{ round_number }}</b></h4>
+
+    <div>
+        <p>Correct genre: {{ genre }}</p>
+        <p>Your guess: {{ guess }}</p>
+        <p>+{{ points }} points!</p>
+    </div>
+
+    <div>
+        <p>Artist: {{ artist }}</p>
+        <a href="{{ spotify_link }}" target="_blank">Discover the artist</a>
+    </div>
+
+    <form method="POST" action="{{ url_for('start_game') }}">
+      <input type="submit" name="submit_button" value="next round"/>
+    </form>
+
+{% endblock content %}
