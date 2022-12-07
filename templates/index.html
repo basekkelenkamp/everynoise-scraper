@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <form method="POST" action="{{ url_for('start_game') }}">
+      <input type="submit" name="submit_button" value="start game"/>
+    </form>
+
+
+{% endblock content %}

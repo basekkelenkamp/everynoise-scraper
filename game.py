@@ -3,57 +3,43 @@ import pandas as pd
 import wordsegment
 from everynoise_scraper import scrape_all_genres, scrape_genre_artists
 
-if __name__ == "__main__":
-    try:
-        g_df = pd.read_csv("genres.csv")
-    except FileNotFoundError:
-        g_df = scrape_all_genres()
 
-    print("STARTING GAME!")
-    print(f"{len(g_df)} genres loaded..")
-    print("Guess genres to gain points..", end="\n\n")
-
+class Game:
     points = 0
-    game = True
-    iteration = 0
-    while game:
-        iteration += 1
-        random_genre = g_df.iloc[randint(0, len(g_df) - 1)]
+    game = False
+    round = 0
+    genres_df = None
+    random_artists = []
+    random_genres = []
+    guesses = []
+
+
+    def __init__(self):
+        self.game = True
+        try:
+            self.genres_df = pd.read_csv("genres.csv")
+        except FileNotFoundError:
+            self.genres_df = scrape_all_genres()
+
+        print("STARTING GAME!")
+        print(f"{len(self.genres_df)} genres loaded..")
+        print("Guess genres to gain points..", end="\n\n")
+
+    def init_new_round(self):
+        self.round += 1
+
+        random_genre = self.genres_df.iloc[randint(0, len(self.genres_df) - 1)]
+        self.random_genres.append(random_genre)
 
         artists_df = scrape_genre_artists(random_genre)
         artists_df.index.name = random_genre["genre"]
         random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
+        self.random_artists.append(random_artist)
 
         print(f"Listen: {random_artist['preview_url']}\n")
+        return self.round, self.points, random_artist['preview_url']
 
-        answer = wordsegment.segment(random_genre["genre"])
-        split_guess = {
-            x.lower() for x in wordsegment.segment(input("Guess the genre: "))
-        }
-
-        split_answer = {x.lower() for x in answer}
-
-        song_points = 0
-        for guess_part in split_guess:
-            if guess_part in split_answer:
-                song_points += 10
-            elif song_points >= 2:
-                song_points -= 2
-
-        if sorted(split_answer) == sorted(split_guess):
-            song_points = 50
-
-        points += song_points
-
-        print(f"{iteration}. Gained +{song_points} song points. Total score: {points}")
-        print(f"\nThe correct genre is: {' '.join(answer)}.")
-        print(
-            f"Artist: {random_artist['artist']}. Save: {random_artist['spotify_link']}",
-            end="\n\n",
-        )
-        key = input("Any key to continue, press x to quit..\n")
-
-        if key == "x":
-            print(f"Points: {points}. Total guesses: {iteration}")
-            game = False
-            quit()
+    def submit_guess(self, guess):
+        self.guesses.append(guess)
+        print(f"guess: {guess}")
+        print(f"answer: {self.random_genres[self.round-1]['genre']}")
