@@ -39,29 +39,28 @@ class Game:
         self.random_artists.append(random_artist)
 
         print(f"Listen: {random_artist['preview_url']}\n")
-        print(wordsegment.segment(self.random_genres[self.round - 1]))
+        print(wordsegment.segment(self.random_genres[-1]))
         return self.round, self.points_total, random_artist['preview_url']
 
     def submit_guess(self, guess):
         self.guesses.append(guess)
-        current_index = self.round - 1
 
-        answer = wordsegment.segment(self.random_genres[current_index])
+        answer = wordsegment.segment(self.random_genres[-1])
         split_answer = {x.lower() for x in answer}
         split_guess = {x.lower() for x in wordsegment.segment(guess)}
 
         self.points_total += self._calculate_points(split_guess, split_answer)
 
         print(f"guess: {guess}")
-        print(f"answer: {self.random_genres[current_index]}")
+        print(f"answer: {self.random_genres[-1]}")
 
         return {
             "round_number": self.round,
-            "points": self.points[current_index],
+            "points": self.points[-1],
             "guess": guess,
-            "genre": " ".join(wordsegment.segment(self.random_genres[current_index])),
-            "artist": self.random_artists[current_index]['artist'],
-            "spotify_link": self.random_artists[current_index]['spotify_link']
+            "genre": " ".join(wordsegment.segment(self.random_genres[-1])),
+            "artist": self.random_artists[-1]['artist'],
+            "spotify_link": self.random_artists[-1]['spotify_link']
         }
 
     def _calculate_points(self, guess: set, answer: set):
