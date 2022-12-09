@@ -76,3 +76,12 @@ class Game:
 
         self.points.append(song_points)
         return song_points
+
+    def reset(self):
+        self.points = []
+        self.points_total = 0
+        self.round = 0
+        self.random_artists = []
+        self.random_genres = []
+        self.guesses = []
+

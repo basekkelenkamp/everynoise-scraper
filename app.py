@@ -8,6 +8,7 @@ game = Game()
 
 @app.route("/")
 def index():
+    game.reset()
     return render_template("index.html")
 
 
