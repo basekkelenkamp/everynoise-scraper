@@ -32,7 +32,6 @@ class Game:
 
         random_genre = self.genres_df.iloc[randint(0, len(self.genres_df) - 1)]
         self.random_genres.append(random_genre['genre'])
-
         artists_df = scrape_genre_artists(random_genre)
         artists_df.index.name = random_genre["genre"]
         random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
@@ -40,12 +39,12 @@ class Game:
 
         print(f"Listen: {random_artist['preview_url']}\n")
         print(wordsegment.segment(self.random_genres[-1]))
-        return self.round, self.points_total, random_artist['preview_url']
+        return self.round, self.points_total, random_artist['preview_url'], random_genre['genre']
 
-    def submit_guess(self, guess):
+    def submit_guess(self, guess, genre):
         self.guesses.append(guess)
 
-        answer = wordsegment.segment(self.random_genres[-1])
+        answer = wordsegment.segment(genre)
         split_answer = {x.lower() for x in answer}
         split_guess = {x.lower() for x in wordsegment.segment(guess)}
 
