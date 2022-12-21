@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from pandas import Series
 import wordsegment
+import re
 
 wordsegment.load()
 
@@ -38,14 +39,14 @@ def scrape_all_genres():
     return genres_df
 
 
-def scrape_genre_artists(genre: Series):
+def scrape_genre_page(genre: Series):
     genre_url = os.path.join(base_url, genre["href"])
     every_noise_genre = requests.get(genre_url)
     soup = BeautifulSoup(every_noise_genre.content, "html.parser")
-    canvas = soup.find("div", {"class": "canvas"})
-    artist_divs = canvas.find_all("div")
+    canvas = soup.find_all("div", {"class": "canvas"})
+    artist_divs = canvas[0].find_all("div")
 
-    return pd.DataFrame(
+    artists_df = pd.DataFrame(
         [
             {
                 "artist": artist_div.text.replace("» ", ""),
@@ -55,3 +56,11 @@ def scrape_genre_artists(genre: Series):
             for artist_div in artist_divs
         ]
     )
+    related_divs = canvas[1].find_all("div")
+    related_genres = [div.text.replace("» ", "") for div in related_divs]
+
+    match = re.search(
+        r"Every Noise at Once · (.*?)\n", soup.find("div", {"class": "title"}).text
+    )
+    real_genre = match.group(1)
+    return artists_df, real_genre, related_genres

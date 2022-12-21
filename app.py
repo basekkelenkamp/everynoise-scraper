@@ -17,7 +17,12 @@ def start_game():
     round_number, points_total, artist_url = game.init_new_round()
 
     print(f"round: {round_number}, points: {points_total} url: {artist_url}")
-    return render_template("game.html", round_number=round_number, points_total=points_total, artist_url=artist_url)
+    return render_template(
+        "game.html",
+        round_number=round_number,
+        points_total=points_total,
+        artist_url=artist_url,
+    )
 
 
 @app.route("/genre_guesser", methods=["POST"])
@@ -27,5 +32,3 @@ def genre_guesser():
 
     # unpacking: rounds, points, guess, genre, artist, spotify_link
     return render_template("answer.html", **answer_dict)
-
-

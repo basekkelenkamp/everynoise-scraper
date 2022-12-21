@@ -1,7 +1,7 @@
 from random import randint
 import pandas as pd
 import wordsegment
-from everynoise_scraper import scrape_all_genres, scrape_genre_artists
+from everynoise_scraper import scrape_all_genres, scrape_genre_page
 
 if __name__ == "__main__":
     try:
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         iteration += 1
         random_genre = g_df.iloc[randint(0, len(g_df) - 1)]
 
-        artists_df = scrape_genre_artists(random_genre)
+        artists_df = scrape_genre_page(random_genre)
         artists_df.index.name = random_genre["genre"]
         random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
 
