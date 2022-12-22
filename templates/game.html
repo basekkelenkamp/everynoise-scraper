@@ -6,6 +6,9 @@
     <p>Points: <b>{{ points_total }}</b></p>
 
     <div>
+        <div>
+            <img id="player-button" src="{{ url_for('static', filename='images/play.png') }}" onclick="audioHandler()">
+        </div>
         <a href="{{ artist_url }}" target="_blank">Click here to listen</a>
         <br>
         <br>
@@ -14,5 +17,8 @@
             <input type="submit" name="submit_button" value="guess"/>
         </form>
     </div>
+
+<div hidden id="audioSelector" data-artistUrl="{{ artist_url }}"></div>
+<script src="{{ url_for('static', filename='js/player.js') }}" crossorigin="anonymous"></script>
 
 {% endblock content %}
