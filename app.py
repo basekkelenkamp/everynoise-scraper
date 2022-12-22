@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, url_for, redirect
-from pprint import pprint
 from game import Game
 
 app = Flask(__name__)

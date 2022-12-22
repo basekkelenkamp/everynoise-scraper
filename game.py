@@ -1,6 +1,5 @@
 from random import randint, choice
 import pandas as pd
-import wordsegment
 from everynoise_scraper import scrape_all_genres, scrape_genre_page
 
 
@@ -17,7 +16,6 @@ class Game:
 
     def __init__(self):
         self.game = True
-        wordsegment.load()
 
         try:
             self.genres_df = pd.read_csv("genres.csv")

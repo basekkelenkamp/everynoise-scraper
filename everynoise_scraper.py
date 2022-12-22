@@ -3,10 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from pandas import Series
-import wordsegment
 import re
 
-wordsegment.load()
 
 base_url = "https://everynoise.com/"
 game_length = 5
