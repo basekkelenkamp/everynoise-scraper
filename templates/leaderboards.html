@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h2>Leaderboards</h2>
+
+{% for round_type in round_type_data %}
+    <h2>{{ round_type.round_type }} Rounds</h2>
+    <div id={{ round_type.round_type }}>
+    <ul>
+    {% for row in round_type.data %}
+        <li># {{loop.index}} {{ row.name }} | Score: {{ row.score }}</li>
+    {% endfor %}
+    </ul>
+    </div>
+{% endfor %}
+
+{% endblock content %}

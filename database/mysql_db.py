@@ -35,6 +35,7 @@ def get_connection():
             "CREATE TABLE players ("
             "id int PRIMARY KEY AUTO_INCREMENT, "
             "cookie_id VARCHAR(64) NOT NULL, "
+            "round_type VARCHAR(16) NOT NULL, "
             "name VARCHAR(64), "
             "total_score int DEFAULT 0, "
             "total_rounds int DEFAULT 1)"
@@ -61,6 +62,7 @@ def get_connection():
     for x in cursor:
         print(x)
 
+    # set to True to reset db
     remove = False
     if remove:
         cursor.execute("DROP TABLE IF EXISTS players")
@@ -142,3 +144,46 @@ def update_player(cursor: Cursor, player: Player, new_points: int):
             player.id,
         ],
     )
+
+
+def update_player_name(cursor: Cursor, player: Player, name: str):
+    query_update_player = """
+        UPDATE players SET 
+        name = %s
+        WHERE id = %s
+    """
+
+    cursor.execute(
+        query_update_player,
+        [
+            name,
+            player.id,
+        ],
+    )
+
+
+def get_all_round_type_highscores(cursor: Cursor, round_types: list):
+    query_select_highscores = """
+        SELECT * FROM players 
+        WHERE round_type=%s 
+        AND name IS NOT NULL 
+        ORDER BY total_score 
+        DESC LIMIT 10
+    """
+
+    highscores = []
+    for round_type in round_types:
+
+        cursor.execute(query_select_highscores, [round_type])
+        results = cursor.fetchall()
+
+        highscore = {"round_type": round_type, "data": []}
+        for result in results:
+            player = Player(*result)
+            highscore["data"].append(
+                {"id": player.id, "name": player.name, "score": player.total_score}
+            )
+
+        highscores.append(highscore)
+
+    return highscores

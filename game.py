@@ -31,11 +31,11 @@ def _calculate_points(guess: str, answer: str, related: list):
     split_answer = sorted(set(answer.split(" ")))
 
     if any(
-            [
-                answer == guess,
-                split_answer == split_guess,
-                "".join(split_guess) == "".join(split_answer),
-            ]
+        [
+            answer == guess,
+            split_answer == split_guess,
+            "".join(split_guess) == "".join(split_answer),
+        ]
     ):
         song_points = 500
         message = "INSANE! You guessed the exact genre!"

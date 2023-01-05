@@ -6,6 +6,7 @@ from typing import Optional
 class Player:
     id: str
     cookie_id: int
+    round_type: int
     name: Optional[str]
     total_score: int
     total_rounds: int
