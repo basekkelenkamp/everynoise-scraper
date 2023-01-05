@@ -14,12 +14,12 @@ def get_connection():
     load_dotenv()
 
     connection = MySQLdb.connect(
-        host=getenv("HOST"),
-        user=getenv("USERNAME"),
-        passwd=getenv("PASSWORD"),
-        database=getenv("DATABASE"),
+        host=getenv("PLANETSCALE_DB_HOST"),
+        user=getenv("PLANETSCALE_DB_USERNAME"),
+        passwd=getenv("PLANETSCALE_DB_PASSWORD"),
+        database=getenv("PLANETSCALE_DB"),
         ssl_mode="VERIFY_IDENTITY",
-        ssl={"ca": "/etc/ssl/cert.pem"},
+        ssl={"ca": getenv("PLANETSCALE_SSL_CERT_PATH")},
     )
 
     cursor = connection.cursor()
