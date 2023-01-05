@@ -1,59 +1,93 @@
-from flask import Flask, render_template, request, url_for, redirect, session
-from game import Game, PlayerNotFoundError
-from flask_session import Session
+import json
+from uuid import uuid4
+from flask import (
+    Flask,
+    render_template,
+    request,
+    make_response,
+)
+
+from database.mysql_db import (
+    get_connection,
+    get_player_by_cookie,
+    insert_round,
+    get_round_by_id,
+    update_round,
+    update_player,
+)
+from game import Game, submit_guess
 import logging as logger
 
+
 app = Flask(__name__)
-
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
+db = get_connection()
 game = Game()
 
 
 @app.route("/")
 def index():
-    session["id"] = game.init_new_player()
-    return render_template("index.html")
+    cookie_id = str(uuid4())
+
+    cursor = db.cursor()
+    query_insert_player = """INSERT INTO players (cookie_id) VALUES (%s)"""
+    cursor.execute(query_insert_player, [cookie_id])
+    db.commit()
+
+    resp = make_response(render_template("index.html"))
+    resp.set_cookie("cookie_id", value=cookie_id)
+    return resp
 
 
-@app.route("/start_game", methods=["GET", "POST"])
-def start_game():
-    try:
-        round_number, points_total, artist_url = game.init_new_round(session["id"])
-    except PlayerNotFoundError as e:
-        logger.error("ERROR: ", e)
-        return f"Error :( \n\n{e}"
+@app.route("/guess", methods=["GET", "POST"])
+def guess():
+    cookie_id = request.cookies.get("cookie_id")
+    if not cookie_id:
+        return render_template("index.html")
 
-    print(f"round: {round_number}, points: {points_total} url: {artist_url}")
-    return render_template(
-        "game.html",
-        round_number=round_number,
-        points_total=points_total,
-        artist_url=artist_url,
+    cursor = db.cursor()
+    player = get_player_by_cookie(cursor, cookie_id)
+
+    artist, genre, related_genres = game.init_new_round()
+    round_id = insert_round(cursor, player, related_genres, genre, artist)
+    db.commit()
+
+    resp = make_response(
+        render_template(
+            "guess.html",
+            round_number=player.total_rounds,
+            points_total=player.total_score,
+            artist_url=artist["preview_url"],
+        )
     )
+    resp.set_cookie("round_id", value=str(round_id))
+    return resp
 
 
-@app.route("/genre_guesser", methods=["POST"])
-def genre_guesser():
-    guess = request.form.get("genre_guess", "")
-    answer_dict = game.submit_guess(session["id"], guess)
+@app.route("/answer", methods=["POST"])
+def answer():
+    round_id = request.cookies.get("round_id")
+    cookie_id = request.cookies.get("cookie_id")
 
-    # unpacking: rounds, points, guess, genre, artist, spotify_link
+    if not round_id or not cookie_id:
+        return render_template("index.html")
+
+    cursor = db.cursor()
+    round_ = get_round_by_id(cursor, int(round_id))
+
+    round_.guess = request.form.get("genre_guess", "")
+    round_.points, message = submit_guess(round_)
+
+    answer_dict = round_.get_answer_fields()
+    answer_dict["message"] = message
+
+    cursor = db.cursor()
+    player = get_player_by_cookie(cursor, cookie_id)
+
+    update_round(cursor, round_)
+    update_player(cursor, player, round_.points)
+
+    db.commit()
+
+    # unpacking: rounds, points, guess, genre, artist, spotify_link, message
     return render_template("answer.html", **answer_dict)
 
-
-@app.route("/reset_all_players", methods=["GET"])
-def reset_all_players():
-    game.remove_all_players()
-    logger.info("All players removed.")
-    return "All players removed."
-
-
-@app.route("/reset_self", methods=["GET"])
-def reset_self():
-    game.remove_by_id(session["id"])
-    session["id"] = None
-    logger.info("Current player removed.")
-    return "Current player removed."

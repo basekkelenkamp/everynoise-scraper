@@ -1,5 +1,9 @@
+import json
 from random import randint, choice
 import pandas as pd
+from pandas import Series
+
+from database.models import Round
 from everynoise_scraper import scrape_all_genres, scrape_genre_page
 from dataclasses import dataclass
 from uuid import uuid4
@@ -9,7 +13,6 @@ from uuid import uuid4
 class Player:
     """Class for keeping track of individual player data."""
 
-    player_id: str
     points: list
     random_artists: list
     random_genres: list
@@ -28,11 +31,11 @@ def _calculate_points(guess: str, answer: str, related: list):
     split_answer = sorted(set(answer.split(" ")))
 
     if any(
-        [
-            answer == guess,
-            split_answer == split_guess,
-            "".join(split_guess) == "".join(split_answer),
-        ]
+            [
+                answer == guess,
+                split_answer == split_guess,
+                "".join(split_guess) == "".join(split_answer),
+            ]
     ):
         song_points = 500
         message = "INSANE! You guessed the exact genre!"
@@ -73,6 +76,31 @@ def _calculate_points(guess: str, answer: str, related: list):
     return song_points, choice(message)
 
 
+def init_new_player() -> Player:
+    return Player(
+        points=[],
+        random_artists=[],
+        random_genres=[],
+        guesses=[],
+        related_genres=[],
+    )
+
+
+def submit_guess(round_: Round):
+
+    answer: str = round_.genre.lower()
+    related: list = [genre.lower() for genre in json.loads(round_.related_genres)]
+
+    points, message = _calculate_points(round_.guess.lower(), answer, related)
+    round_.points = points
+
+    print(message)
+    print(f"guess: {round_.guess}")
+    print(f"answer: {round_.genre}")
+
+    return points, message
+
+
 class Game:
     players: list[Player] = []
     game = False
@@ -109,65 +137,17 @@ class Game:
 
         return player
 
-    def init_new_round(self, id_):
-        player: Player = self._get_player_by_id(id_)
-
-        player.round += 1
-        random_genre: str = self.genres_df.iloc[randint(0, len(self.genres_df) - 1)]
+    def init_new_round(self):
+        random_genre: Series = self.genres_df.iloc[randint(0, len(self.genres_df) - 1)]
 
         artists_df, real_genre, related_genres = scrape_genre_page(random_genre)
         random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
-
-        player.random_genres.append(real_genre)
-        player.related_genres.append(related_genres)
-        player.random_artists.append(random_artist)
 
         print(f"Listen: {random_artist['preview_url']}")
         print(real_genre)
         print(related_genres)
 
-        return player.round, player.points_total, random_artist["preview_url"]
-
-    def submit_guess(self, id_, guess):
-        player: Player = self._get_player_by_id(id_)
-
-        player.guesses.append(guess)
-
-        answer: str = player.random_genres[-1].lower()
-        related: list = [genre.lower() for genre in player.related_genres[-1]]
-
-        points, message = _calculate_points(guess.lower(), answer, related)
-        player.points.append(points)
-        player.points_total += points
-
-        print(message)
-        print(f"guess: {guess}")
-        print(f"answer: {player.random_genres[-1]}")
-
-        return {
-            "round_number": player.round,
-            "points": points,
-            "guess": guess,
-            "genre": player.random_genres[-1],
-            "artist": player.random_artists[-1]["artist"],
-            "spotify_link": player.random_artists[-1]["spotify_link"],
-            "message": message,
-        }
-
-    def init_new_player(self) -> str:
-        player_id = str(uuid4())
-        self.players.append(
-            Player(
-                player_id=player_id,
-                points=[],
-                random_artists=[],
-                random_genres=[],
-                guesses=[],
-                related_genres=[],
-            )
-        )
-
-        return player_id
+        return random_artist, real_genre, related_genres
 
     def remove_all_players(self):
         self.players = []
