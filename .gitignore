@@ -4,3 +4,5 @@ temp.py
 __pycache__/
 database/__pycache__/
 hostname
+static/gen
+static/.webassets-cache

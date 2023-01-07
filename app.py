@@ -16,13 +16,18 @@ from database.mysql_db import (
     update_round,
     update_player,
     update_player_name,
-    get_all_round_type_highscores,
+    get_all_round_type_highscores, insert_player,
 )
 from game import Game, submit_guess
 import logging as logger
-
+from util.assets import bundles
+from flask_assets import Environment, Bundle
 
 app = Flask(__name__)
+
+assets = Environment(app)
+assets.register(bundles)
+
 db = get_connection()
 game = Game()
 
@@ -47,10 +52,7 @@ def guess():
         round_type = "0"
 
     cursor = db.cursor()
-    query_insert_player = (
-        """INSERT INTO players (cookie_id, round_type) VALUES (%s, %s)"""
-    )
-    cursor.execute(query_insert_player, [cookie_id, round_type])
+    insert_player(cursor, cookie_id, round_type)
     db.commit()
 
     player = get_player_by_cookie(cursor, cookie_id)

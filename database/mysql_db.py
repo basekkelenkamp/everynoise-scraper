@@ -72,6 +72,13 @@ def get_connection():
     return connection
 
 
+def insert_player(cursor: Cursor, cookie_id: str, round_type: str):
+    query_insert_player = (
+        """INSERT INTO players (cookie_id, round_type) VALUES (%s, %s)"""
+    )
+    cursor.execute(query_insert_player, [cookie_id, round_type])
+
+
 def get_player_by_cookie(cursor: Cursor, cookie_id: str):
     query_select_player = """SELECT * FROM players WHERE cookie_id = %s"""
     cursor.execute(query_select_player, [cookie_id])

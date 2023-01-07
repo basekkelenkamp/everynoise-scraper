@@ -1,0 +1,42 @@
+@font-face {
+    font-family: caviar;
+    src: url(../css/fonts/caviar_dreams/CaviarDreams_Bold.ttf);
+}
+     
+html {
+    font-size: 16px;
+}
+
+body {
+   color: $text-main;
+   font-family: caviar;
+}
+
+h1 {
+    font-size: 3em;
+}
+
+.bordered {
+    border: solid 1px $border-color !important;
+}
+
+button {
+    background-color: white;
+    border: 2px solid $border-color;
+    padding:1em 3em;
+    font-weight: bold;
+    font-size: 1em;
+    position:relative;
+    color:$primary;
+
+    &:after {
+        content:'';
+        position:absolute;
+        background-color:$primary-light1;
+        top:8px;
+        left:8px;
+        right:-8px;
+        bottom:-8px;
+        z-index:-1;
+      }
+}
