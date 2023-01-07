@@ -2,6 +2,9 @@
 {% block content %}
 
     <h2>Leaderboards</h2>
+ <form method="GET" action="{{ url_for('index') }}">
+  <button type="submit" id="submit_button" name="submit_button">play again?</button>
+</form>
 
 {% for round_type in round_type_data %}
     <h2>{{ round_type.round_type }} Rounds</h2>

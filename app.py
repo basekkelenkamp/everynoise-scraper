@@ -118,12 +118,12 @@ def submit_score():
     db.commit()
     cursor.close()
 
-    return redirect(url_for("leaderboards", round_type=player.round_type, id=player.id))
+    return redirect(url_for("leaderboards", round_type=player.round_type, id_=player.id))
 
 
 @app.route("/leaderboards/")
-@app.route("/leaderboards/<id>")
-def leaderboards(id_=None, round_type=5):
+@app.route("/leaderboards/<round_type>/<id_>")
+def leaderboards(round_type=5, id_=None):
     print(id_, round_type)
 
     cursor = db.cursor()
