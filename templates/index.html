@@ -1,13 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>Select round type:</h2>
-
  <form method="POST" action="{{ url_for('guess') }}">
+  <h2>Select round type:</h2>
   {% for round_type in round_types %}
-      <input type="checkbox" name="box[1][]"  id="option{{loop.index}}" value="{{ round_type }}" {{ 'checked' if loop.index == 1 }}>
-      <label for="option{{loop.index}}">{{ round_type }}</label>
+      <div class="round-type">
+        <input type="checkbox" name="box[1][]"  id="option{{loop.index}}" value="{{ round_type }}" {{ 'checked' if loop.index == 1 }}>
+        <label for="option{{loop.index}}">{{ round_type }}</label>  
+      </div>
       <br>
+
   {% endfor %}
   <button type="submit" id="submit_button" name="submit_button">START</button>
 </form>

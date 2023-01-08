@@ -1,0 +1,20 @@
+form {
+
+    div {
+    }
+
+    label {
+        font-size: 1.5em;
+    }
+  
+    input[type="checkbox"] {
+        margin-right: 0.5em;
+        flex-direction: row;
+        -ms-transform: scale(2); /* IE */
+        -moz-transform: scale(2); /* FF */
+        -webkit-transform: scale(2); /* Safari and Chrome */
+        -o-transform: scale(2); /* Opera */
+        transform: scale(2);
+      }
+      }
+  
