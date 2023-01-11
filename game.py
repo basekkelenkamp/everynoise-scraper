@@ -118,15 +118,6 @@ class Game:
         print(f"{len(self.genres_df)} genres loaded..")
         print("Guess genres to gain points..", end="\n\n")
 
-    def reset(self):
-        self.points = []
-        self.points_total = 0
-        self.round = 0
-        self.random_artists = []
-        self.random_genres = []
-        self.guesses = []
-        self.related_genres = []
-
     def _get_player_by_id(self, id_) -> Player:
         player = next((p for p in self.players if p.player_id == id_), None)
 
@@ -148,12 +139,3 @@ class Game:
         print(related_genres)
 
         return random_artist, real_genre, related_genres
-
-    def remove_all_players(self):
-        self.players = []
-
-    def remove_by_id(self, id_):
-        for i, player in enumerate(self.players):
-            if player.player_id == id_:
-                del self.players[i]
-                break
