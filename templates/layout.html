@@ -10,9 +10,10 @@
 <!--    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" crossorigin="anonymous">-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js" crossorigin="anonymous"></script>
 
-    {% assets "home_css" %}
-    <link rel="stylesheet" href="{{ ASSET_URL }}">
-    {% endassets %}
+<!--    <link rel="stylesheet" href="{{ ASSET_URL }}">-->
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='gen/home.9b6523dd.css') }}">
+
     <title>Guess the Genre</title>
 </head>
 <body>

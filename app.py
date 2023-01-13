@@ -21,13 +21,15 @@ from database.mysql_db import (
 )
 from game import Game, submit_guess
 # import logging as logger
-from util.assets import bundles
-from flask_assets import Environment
+# from util.assets import bundles
+# from flask_assets import Environment
 
 app = Flask(__name__)
 
-assets = Environment(app)
-assets.register(bundles)
+# assets = Environment(app)
+# assets.manifest = False
+# assets.cache = False
+# assets.register(bundles)
 
 db = get_connection()
 game = Game()
