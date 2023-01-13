@@ -25,7 +25,7 @@ from game import Game, submit_guess
 # from flask_assets import Environment
 
 app = Flask(__name__)
-
+# test
 # assets = Environment(app)
 # assets.manifest = False
 # assets.cache = False
