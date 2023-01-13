@@ -1,24 +1,25 @@
 import json
-
-from MySQLdb.cursors import Cursor
 from dotenv import load_dotenv
-import MySQLdb
 from os import getenv
 
 from database.models import Player, Round
 
+import pymysql
+from pymysql.cursors import Cursor
+
+pymysql.install_as_MySQLdb()
 load_dotenv()
 
 
 def get_connection():
     load_dotenv()
 
-    connection = MySQLdb.connect(
+    connection = pymysql.connect(
         host=getenv("PLANETSCALE_DB_HOST"),
         user=getenv("PLANETSCALE_DB_USERNAME"),
         passwd=getenv("PLANETSCALE_DB_PASSWORD"),
         database=getenv("PLANETSCALE_DB"),
-        ssl_mode="VERIFY_IDENTITY",
+        ssl_verify_identity=True,
         ssl={"ca": getenv("PLANETSCALE_SSL_CERT_PATH")},
     )
 

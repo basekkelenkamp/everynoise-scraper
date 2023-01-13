@@ -16,12 +16,13 @@ from database.mysql_db import (
     update_round,
     update_player,
     update_player_name,
-    get_all_round_type_highscores, insert_player,
+    get_all_round_type_highscores,
+    insert_player,
 )
 from game import Game, submit_guess
-import logging as logger
+# import logging as logger
 from util.assets import bundles
-from flask_assets import Environment, Bundle
+from flask_assets import Environment
 
 app = Flask(__name__)
 
@@ -120,7 +121,9 @@ def submit_score():
     db.commit()
     cursor.close()
 
-    return redirect(url_for("leaderboards", round_type=player.round_type, id_=player.id))
+    return redirect(
+        url_for("leaderboards", round_type=player.round_type, id_=player.id)
+    )
 
 
 @app.route("/leaderboards/")

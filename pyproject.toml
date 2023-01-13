@@ -5,15 +5,15 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 requests = "^2.28.1"
 pandas = "^1.5.2"
 bs4 = "^0.0.1"
 Flask = "^2.2.2"
 python-dotenv = "^0.21.0"
-mysqlclient = "^2.1.1"
 libsass = "^0.22.0"
 flask-assets = "^2.0"
+pymysql = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.10.0"
