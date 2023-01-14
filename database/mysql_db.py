@@ -72,7 +72,7 @@ def get_connection():
         print(f"removed players: {remove_player}")
 
     # Remove players with no name set
-    remove_empty = True
+    remove_empty = False
     if remove_empty:
         remove_empty_names(cursor)
         connection.commit()
