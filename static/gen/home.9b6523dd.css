@@ -2,6 +2,16 @@
   font-family: caviar;
   src: url(../css/fonts/caviar_dreams/CaviarDreams_Bold.ttf); }
 
+a { 
+  color:inherit;
+  text-decoration: none;
+}
+
+a:visited { text-decoration: none; color:inherit; }
+a:hover { text-decoration: underline; color:inherit; }
+a:focus { text-decoration: none; color:inherit; }
+a:hover, a:active { text-decoration: none; color:inherit }
+
 html {
   font-size: 16px; }
 
