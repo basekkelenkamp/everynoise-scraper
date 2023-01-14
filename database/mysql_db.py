@@ -63,9 +63,24 @@ def get_connection():
     for x in cursor:
         print(x)
 
+    # Remove players by name and its rounds
+    remove_player = []
+    if remove_player:
+        for player in remove_player:
+            remove_player_by_name(cursor, player)
+        connection.commit()
+        print(f"removed players: {remove_player}")
+
+    # Remove players with no name set
+    remove_empty = True
+    if remove_empty:
+        remove_empty_names(cursor)
+        connection.commit()
+        print("removed all empty players")
+
     # set to True to reset db
-    remove = False
-    if remove:
+    clear_db = False
+    if clear_db:
         cursor.execute("DROP TABLE IF EXISTS players")
         cursor.execute("DROP TABLE IF EXISTS rounds")
         print("DROPPED TABLES")
@@ -168,6 +183,31 @@ def update_player_name(cursor: Cursor, player: Player, name: str):
             player.id,
         ],
     )
+
+
+def remove_player_by_name(cursor: Cursor, player):
+    query_select_player = """SELECT * FROM players WHERE name = %s"""
+    cursor.execute(query_select_player, [player])
+    player_obj = Player(*cursor.fetchone())
+
+    query_delete_rounds = """DELETE FROM rounds WHERE player_id = %s"""
+    cursor.execute(query_delete_rounds, [player_obj.id])
+
+    query_delete_player = """DELETE FROM players WHERE id = %s"""
+    cursor.execute(query_delete_player, [player_obj.id])
+
+
+def remove_empty_names(cursor: Cursor):
+    query_select_empty = """SELECT * FROM players WHERE name is NULL OR name = ''"""
+    cursor.execute(query_select_empty)
+    empty_players = [Player(*player) for player in cursor.fetchall()]
+
+    for empty_player in empty_players:
+        query_delete_rounds = """DELETE FROM rounds WHERE player_id = %s"""
+        cursor.execute(query_delete_rounds, [empty_player.id])
+
+        query_delete_player = """DELETE FROM players WHERE id = %s"""
+        cursor.execute(query_delete_player, [empty_player.id])
 
 
 def get_all_round_type_highscores(cursor: Cursor, round_types: list):
