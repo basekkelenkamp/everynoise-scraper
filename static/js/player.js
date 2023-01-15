@@ -9,7 +9,13 @@ window.onload = function(){
     let d = document.getElementById("audioSelector")
     artistUrl = d.dataset.artisturl
     console.log(artistUrl)
-}
+    }
+
+let volume = document.getElementById('volume-slider');
+volume.addEventListener("change", function(e) {
+    audioPlayer.volume = e.currentTarget.value / 100;
+})
+
 
 function audioHandler() {
     console.log(artistUrl)
