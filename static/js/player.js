@@ -1,9 +1,11 @@
-let audioPlayer = document.createElement('audio')
-audioPlayer.id = 'audio'
-audioPlayer.setAttribute("muted", "true")
-document.body.appendChild(audioPlayer)
+// let audioPlayer = document.createElement('audio')
+// audioPlayer.id = 'audio'
+// audioPlayer.setAttribute("muted", "true")
+// document.body.appendChild(audioPlayer)
 
 let playing = false
+let firstClick = true
+let audioPlayer = null
 
 window.onload = function(){
     let d = document.getElementById("audioSelector")
@@ -19,6 +21,14 @@ volume.addEventListener("change", function(e) {
 
 function audioHandler() {
     console.log(artistUrl)
+    if (firstClick) {
+        audioPlayer = document.createElement('audio')
+        audioPlayer.id = 'audio'
+        audioPlayer.setAttribute("muted", "true")
+        document.body.appendChild(audioPlayer)
+        firstClick = false
+    }
+
     let play = document.getElementById("player-button")
     if (!playing) {
         playing = true
