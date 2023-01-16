@@ -20,6 +20,7 @@ from database.mysql_db import (
     insert_player,
 )
 from game import Game, submit_guess
+
 # import logging as logger
 # from util.assets import bundles
 # from flask_assets import Environment
@@ -55,8 +56,10 @@ def guess():
         round_type = "0"
 
     cursor = db.cursor()
-    insert_player(cursor, cookie_id, round_type)
-    db.commit()
+    
+    if not get_player_by_cookie(cursor, cookie_id):
+        insert_player(cursor, cookie_id, round_type)
+        db.commit()
 
     player = get_player_by_cookie(cursor, cookie_id)
 

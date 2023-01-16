@@ -98,8 +98,11 @@ def insert_player(cursor: Cursor, cookie_id: str, round_type: str):
 def get_player_by_cookie(cursor: Cursor, cookie_id: str):
     query_select_player = """SELECT * FROM players WHERE cookie_id = %s"""
     cursor.execute(query_select_player, [cookie_id])
-
-    return Player(*cursor.fetchone())
+    result = cursor.fetchone()
+    if result:
+        return Player(*result)
+    else:
+        return None
 
 
 def get_round_by_id(cursor: Cursor, id_: int):
