@@ -1,17 +1,5 @@
-// let audioPlayer = document.createElement('audio')
-// audioPlayer.id = 'audio'
-// audioPlayer.setAttribute("muted", "true")
-// document.body.appendChild(audioPlayer)
-
+let audioPlayer = new Audio()
 let playing = false
-let firstClick = true
-
-const audioPlayer = new Audio();
-audioPlayer.autoplay = true;
-audioPlayer.id = 'audio'
-audioPlayer.setAttribute("muted", "true")
-audioPlayer.src = ''
-
 
 window.onload = function(){
     let d = document.getElementById("audioSelector")
@@ -27,14 +15,6 @@ volume.addEventListener("change", function(e) {
 
 function audioHandler() {
     console.log(artistUrl)
-    // if (firstClick) {
-    //     audioPlayer = document.createElement('audio')
-    //     audioPlayer.id = 'audio'
-    //     audioPlayer.setAttribute("muted", "true")
-    //     document.body.appendChild(audioPlayer)
-    //     firstClick = false
-    // }
-
     let play = document.getElementById("player-button")
     if (!playing) {
         playing = true
@@ -55,6 +35,7 @@ function playMusic(audio) {
     }
     audioPlayer.pause()
     audioPlayer.src = audio
+    audioPlayer.load(audio)
     audioPlayer.play()
     console.log("audio playing")
 }
