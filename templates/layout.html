@@ -19,6 +19,7 @@
 <body>
     <header>
         <h1><a href="{{ url_for('index') }}">Genre guesser</a></h1>
+        <div class="icon-container"><a href="{{ url_for('leaderboards') }}">leaderboards</a></div>
         <div class="icon-container"><a href="{{ url_for('index') }}">Home</a></div>
     </header>
     <div>{% block content %}{% endblock %}</div>
