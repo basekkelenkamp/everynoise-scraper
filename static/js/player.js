@@ -10,6 +10,7 @@ const audioPlayer = new Audio();
 audioPlayer.autoplay = true;
 audioPlayer.id = 'audio'
 audioPlayer.setAttribute("muted", "true")
+audioPlayer.src = ''
 
 
 window.onload = function(){
