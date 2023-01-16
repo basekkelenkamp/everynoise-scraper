@@ -18,6 +18,8 @@ from database.mysql_db import (
     update_player_name,
     get_all_round_type_highscores,
     insert_player,
+    get_player_by_id,
+    get_all_rounds_from_player,
 )
 from game import Game, submit_guess
 
@@ -56,12 +58,12 @@ def guess():
         round_type = "0"
 
     cursor = db.cursor()
-    
-    if not get_player_by_cookie(cursor, cookie_id):
-        insert_player(cursor, cookie_id, round_type)
-        db.commit()
 
     player = get_player_by_cookie(cursor, cookie_id)
+    if not player:
+        insert_player(cursor, cookie_id, round_type)
+        db.commit()
+        player = get_player_by_cookie(cursor, cookie_id)
 
     artist, genre, related_genres = game.init_new_round()
     round_id = insert_round(cursor, player, related_genres, genre, artist)
@@ -144,4 +146,21 @@ def leaderboards(round_type=5, id_=None):
         player_id=id_,
         current_round_type=round_type,
         round_type_data=round_type_highscores,
+    )
+
+
+@app.route("/match_details/<player_id>")
+def match_details(player_id):
+
+    cursor = db.cursor()
+    player = get_player_by_id(cursor, int(player_id))
+
+    # guess, genre, points, artist_name, artist_spotify
+    rounds = get_all_rounds_from_player(cursor, player.id)
+
+    if not player or not rounds:
+        return render_template("index.html")
+
+    return render_template(
+        "match_details.html", name=player.name, score=player.total_score, rounds=rounds
     )

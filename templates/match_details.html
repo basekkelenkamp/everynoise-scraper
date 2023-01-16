@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h2>Match details</h2>
+
+    <h3>{{ name }} | Score: {{ score }}</h3>
+    <div>
+    <ul>
+    {% for round in rounds %}
+        <li>{{loop.index}}. Guess: {{ round.guess }} | Answer: {{ round.genre }} | Points: {{ round.points }} | Artist: <a href="{{ rounds.spotify_link }}" target="_blank">{{ round.artist_name }}</a></li>
+    {% endfor %}
+    </ul>
+    </div>
+
+{% endblock content %}

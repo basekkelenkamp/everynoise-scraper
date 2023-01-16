@@ -11,7 +11,7 @@
     <div id={{ round_type.round_type }}>
     <ul>
     {% for row in round_type.data %}
-        <li># {{loop.index}} {{ row.name }} | Score: {{ row.score }}</li>
+        <li># {{loop.index}} {{ row.name }} | Score: {{ row.score }} |<a href="{{ url_for('match_details', player_id=row.id) }}">details</a></li>
     {% endfor %}
     </ul>
     </div>
