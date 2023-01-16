@@ -155,7 +155,7 @@ def update_round(cursor: Cursor, round_: Round):
         guess = %s, 
         points = %s
         WHERE id = %s
-        AND guess IS NULL"
+        AND guess IS NULL
     """
 
     cursor.execute(query_update_round, [round_.guess, round_.points, round_.id])
