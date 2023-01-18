@@ -1,3 +1,4 @@
+import json
 from uuid import uuid4
 from flask import (
     Flask,
@@ -22,6 +23,8 @@ from database.mysql_db import (
     get_all_rounds_from_player,
 )
 from game import Game, submit_guess
+from datetime import date
+
 
 # import logging as logger
 # from util.assets import bundles
@@ -52,7 +55,7 @@ def guess():
     cookie_id = request.cookies.get("cookie_id")
     round_type = request.form.get("box[1][]")
     if not cookie_id:
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     if not round_type:
         round_type = "0"
@@ -89,7 +92,7 @@ def answer():
     cookie_id = request.cookies.get("cookie_id")
 
     if not round_id or not cookie_id:
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     cursor = db.cursor()
     round_ = get_round_by_id(cursor, int(round_id))
@@ -122,7 +125,7 @@ def submit_score():
     name = request.form.get("name")
     cookie_id = request.cookies.get("cookie_id")
     if not name and not cookie_id and not request.form.get("submit_score"):
-        render_template("index.html")
+        redirect(url_for("index"))
 
     cursor = db.cursor()
     player = get_player_by_cookie(cursor, cookie_id)
@@ -161,8 +164,60 @@ def match_details(player_id):
     rounds = get_all_rounds_from_player(cursor, player.id)
 
     if not player or not rounds:
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     return render_template(
         "match_details.html", name=player.name, score=player.total_score, rounds=rounds
     )
+
+
+@app.route("/daily_challenge")
+def daily_challenge():
+    daily_date = request.cookies.get("daily_challenge")
+
+    if daily_date and daily_date == str(date.today()):
+        return redirect(url_for("index"))
+    else:
+        daily_date = str(date.today())
+
+    resp = make_response(redirect(url_for("guess_daily", daily_date=daily_date)))
+    resp.set_cookie("cookie_challenge_id", value=str(uuid4()))
+    resp.set_cookie("daily_challenge", daily_date)
+    return resp
+
+
+@app.route("/guess/daily/<daily_date>", methods=["GET", "POST"])
+def guess_daily(daily_date):
+    breakpoint()
+    cookie_id = request.cookies.get("cookie_challenge_id")
+
+    if not cookie_id:
+        return redirect(url_for("index"))
+
+    cursor = db.cursor()
+
+    player = get_player_by_cookie(cursor, cookie_id)
+    if not player:
+        insert_player(cursor, cookie_id, daily_date)
+        db.commit()
+        player = get_player_by_cookie(cursor, cookie_id)
+        # get daily_challenge by daily_date
+        # if not:
+        #       game.init_new_daily_challenge
+
+    # artist, genre, related_genres = game.init_new_round()
+    # round_id = insert_round(cursor, player, related_genres, genre, artist)
+    # db.commit()
+    # cursor.close()
+    #
+    # resp = make_response(
+    #     render_template(
+    #         "guess.html",
+    #         round_number=player.total_rounds,
+    #         round_type=player.round_type,
+    #         points_total=player.total_score,
+    #         artist_url=artist["preview_url"],
+    #     )
+    # )
+    # resp.set_cookie("round_id", value=str(round_id))
+    # return resp
