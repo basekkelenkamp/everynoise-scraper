@@ -47,7 +47,7 @@ def index():
     return resp
 
 
-@app.route("/guess", methods=["GET", "POST"])
+@app.route("/guess", methods=["POST"])
 def guess():
     cookie_id = request.cookies.get("cookie_id")
     round_type = request.form.get("box[1][]")
@@ -112,7 +112,9 @@ def answer():
     end = player.total_rounds >= int(player.round_type)
 
     # unpacking: rounds, points, guess, genre, artist, spotify_link, message
-    return render_template("answer.html", **answer_dict, end=end)
+    resp = make_response(render_template("answer.html", **answer_dict, end=end))
+    resp.set_cookie("round_id", expires=0)
+    return resp
 
 
 @app.route("/submit_score", methods=["POST"])
