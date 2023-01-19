@@ -93,6 +93,7 @@ def guess():
 
     valid_rounds = get_all_rounds_from_player(cursor, player.id, empty_guess_only=True)
 
+    valid_rounds[0].genre
     resp = make_response(
         render_template(
             "guess.html",
