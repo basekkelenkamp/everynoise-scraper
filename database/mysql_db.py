@@ -231,17 +231,6 @@ def get_all_rounds_from_player(cursor: Cursor, player_id: int, empty_guess_only=
     cursor.execute(query_select_rounds, [player_id])
     return [Round(*round) for round in cursor.fetchall()]
 
-    # return [
-    #     {
-    #         "guess": r.guess,
-    #         "genre": r.genre,
-    #         "points": r.points,
-    #         "artist_name": r.artist_name,
-    #         "artist_spotify": r.artist_spotify,
-    #     }
-    #     for r in rounds
-    # ]
-
 
 def get_all_round_type_highscores(cursor: Cursor, round_types: list):
     query_select_highscores = """

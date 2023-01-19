@@ -7,7 +7,7 @@
     <div>
     <ul>
     {% for round in rounds %}
-        <li>{{loop.index}}. Guess: {{ round.guess }} | Answer: {{ round.genre }} | Points: {{ round.points }} | Artist: <a href="{{ rounds.spotify_link }}" target="_blank">{{ round.artist_name }}</a></li>
+        <li>{{loop.index}}. Guess: {{ round.guess }} | Answer: {{ round.genre }} | Points: {{ round.points }} | Artist: <a href="{{ round.artist_spotify }}" target="_blank">{{ round.artist_name }}</a></li>
     {% endfor %}
     </ul>
     </div>

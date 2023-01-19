@@ -123,11 +123,12 @@ def answer():
     round_.guess = request.form.get("genre_guess", "skipped")
     round_.points, message = submit_guess(round_)
 
-    answer_dict = round_.get_answer_fields()
-    answer_dict["message"] = message
-
     cursor = db.cursor()
     player = get_player_by_cookie(cursor, cookie_id)
+
+    answer_dict = round_.get_answer_fields()
+    answer_dict["message"] = message
+    answer_dict["round_number"] = player.total_rounds
 
     update_round(cursor, round_)
     update_player(cursor, player, round_.points)
@@ -186,11 +187,25 @@ def match_details(player_id):
     # guess, genre, points, artist_name, artist_spotify
     rounds = get_all_rounds_from_player(cursor, player.id)
 
+    rounds_dict = [
+        {
+            "guess": r.guess,
+            "genre": r.genre,
+            "points": r.points,
+            "artist_name": r.artist_name,
+            "artist_spotify": r.artist_spotify,
+        }
+        for r in rounds
+    ]
+
     if not player or not rounds:
         return redirect(url_for("index"))
 
     return render_template(
-        "match_details.html", name=player.name, score=player.total_score, rounds=rounds
+        "match_details.html",
+        name=player.name,
+        score=player.total_score,
+        rounds=rounds_dict,
     )
 
 
