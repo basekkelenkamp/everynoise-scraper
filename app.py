@@ -123,8 +123,11 @@ def answer():
     if round_.guess:
         return redirect(url_for("index"))
 
-    round_.guess = request.form.get("genre_guess", "skipped")
+    round_.guess = request.form.get("genre_guess")
     round_.points, message = submit_guess(round_)
+
+    if not round_.guess:
+        round_.guess = 'skipped'
 
     cursor = db.cursor()
     player = get_player_by_cookie(cursor, cookie_id)
