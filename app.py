@@ -45,33 +45,53 @@ ROUND_TYPES = ["5", "10", "30"]
 
 @app.route("/")
 def index():
-    resp = make_response(render_template("index.html", round_types=ROUND_TYPES))
-    resp.set_cookie("cookie_id", value=str(uuid4()))
+    return render_template("index.html", round_types=ROUND_TYPES)
+
+
+@app.route("/create_game", methods=["POST"])
+def create_game():
+    round_type = request.form.get("box[1][]")
+    cookie_id = str(uuid4())
+
+    if not round_type:
+        return redirect(url_for("index"))
+
+    cursor = db.cursor()
+    player_id = insert_player(cursor, cookie_id, round_type)
+    player = get_player_by_id(cursor, player_id)
+
+    rounds_data = game.generate_all_rounds(round_type)
+
+    for round_ in rounds_data:
+        (artist, genre, related_genres) = round_
+        round_id = insert_round(cursor, player, related_genres, genre, artist)
+        print(round_id)
+
+    db.commit()
+    cursor.close()
+
+    resp = make_response(redirect(url_for("guess")))
+    resp.set_cookie("cookie_id", value=cookie_id)
+    resp.set_cookie("round_type", value=round_type)
+    resp.set_cookie("round_id", expires=0)
     return resp
 
 
-@app.route("/guess", methods=["POST"])
+@app.route("/guess", methods=["GET", "POST"])
 def guess():
     cookie_id = request.cookies.get("cookie_id")
-    round_type = request.form.get("box[1][]")
-    if not cookie_id:
+    round_type = request.cookies.get("round_type")
+
+    if not cookie_id or request.cookies.get("round_id"):
         return redirect(url_for("index"))
 
-    if not round_type:
-        round_type = "0"
-
     cursor = db.cursor()
-
     player = get_player_by_cookie(cursor, cookie_id)
-    if not player:
-        insert_player(cursor, cookie_id, round_type)
-        db.commit()
-        player = get_player_by_cookie(cursor, cookie_id)
 
-    artist, genre, related_genres = game.init_new_round()
-    round_id = insert_round(cursor, player, related_genres, genre, artist)
-    db.commit()
-    cursor.close()
+    if not player:
+        return redirect(url_for("index"))
+
+    valid_rounds = get_all_rounds_from_player(cursor, player.id, empty_guess_only=True)
 
     resp = make_response(
         render_template(
@@ -79,10 +99,10 @@ def guess():
             round_number=player.total_rounds,
             round_type=player.round_type,
             points_total=player.total_score,
-            artist_url=artist["preview_url"],
+            artist_url=valid_rounds[0].artist_preview_url,
         )
     )
-    resp.set_cookie("round_id", value=str(round_id))
+    resp.set_cookie("round_id", value=str(valid_rounds[0].id))
     return resp
 
 
@@ -97,7 +117,10 @@ def answer():
     cursor = db.cursor()
     round_ = get_round_by_id(cursor, int(round_id))
 
-    round_.guess = request.form.get("genre_guess", "")
+    if round_.guess:
+        return redirect(url_for("index"))
+
+    round_.guess = request.form.get("genre_guess", "skipped")
     round_.points, message = submit_guess(round_)
 
     answer_dict = round_.get_answer_fields()
@@ -110,9 +133,9 @@ def answer():
     update_player(cursor, player, round_.points)
 
     db.commit()
-    cursor.close()
 
-    end = player.total_rounds >= int(player.round_type)
+    end = 0 == len(get_all_rounds_from_player(cursor, player.id, empty_guess_only=True))
+    cursor.close()
 
     # unpacking: rounds, points, guess, genre, artist, spotify_link, message
     resp = make_response(render_template("answer.html", **answer_dict, end=end))
@@ -124,7 +147,7 @@ def answer():
 def submit_score():
     name = request.form.get("name")
     cookie_id = request.cookies.get("cookie_id")
-    if not name and not cookie_id and not request.form.get("submit_score"):
+    if not name or not cookie_id or not request.form.get("submit_score"):
         redirect(url_for("index"))
 
     cursor = db.cursor()

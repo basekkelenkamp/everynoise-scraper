@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
- <form method="POST" action="{{ url_for('guess') }}">
+ <form method="POST" action="{{ url_for('create_game') }}">
   <h2>Select round type:</h2>
   {% for round_type in round_types %}
       <div class="round-type">

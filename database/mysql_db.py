@@ -93,6 +93,7 @@ def insert_player(cursor: Cursor, cookie_id: str, round_type: str):
         """INSERT INTO players (cookie_id, round_type) VALUES (%s, %s)"""
     )
     cursor.execute(query_insert_player, [cookie_id, round_type])
+    return cursor.lastrowid
 
 
 def get_player_by_cookie(cursor: Cursor, cookie_id: str):
@@ -220,21 +221,26 @@ def remove_empty_names(cursor: Cursor):
         cursor.execute(query_delete_player, [empty_player.id])
 
 
-def get_all_rounds_from_player(cursor: Cursor, player_id: int):
+def get_all_rounds_from_player(cursor: Cursor, player_id: int, empty_guess_only=False):
     query_select_rounds = """SELECT * FROM rounds WHERE player_id = %s"""
-    cursor.execute(query_select_rounds, [player_id])
-    rounds = [Round(*round) for round in cursor.fetchall()]
+    if empty_guess_only:
+        query_select_rounds = (
+            """SELECT * FROM rounds WHERE player_id = %s AND guess IS NULL"""
+        )
 
-    return [
-        {
-            "guess": r.guess,
-            "genre": r.genre,
-            "points": r.points,
-            "artist_name": r.artist_name,
-            "artist_spotify": r.artist_spotify,
-        }
-        for r in rounds
-    ]
+    cursor.execute(query_select_rounds, [player_id])
+    return [Round(*round) for round in cursor.fetchall()]
+
+    # return [
+    #     {
+    #         "guess": r.guess,
+    #         "genre": r.genre,
+    #         "points": r.points,
+    #         "artist_name": r.artist_name,
+    #         "artist_spotify": r.artist_spotify,
+    #     }
+    #     for r in rounds
+    # ]
 
 
 def get_all_round_type_highscores(cursor: Cursor, round_types: list):

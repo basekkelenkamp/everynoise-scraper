@@ -1,6 +1,7 @@
 import json
 from random import randint, choice
 import pandas as pd
+import requests
 from pandas import Series
 
 from database.models import Round
@@ -139,3 +140,36 @@ class Game:
         print(related_genres)
 
         return random_artist, real_genre, related_genres
+
+    def generate_all_rounds(self, round_type):
+        try:
+            round_type = int(round_type)
+        except ValueError:
+            if round_type == ["daily_challenge"]:
+                round_type = 3
+            round_type = 5
+
+        rounds = []
+        while len(rounds) != round_type:
+            random_genre: Series = self.genres_df.iloc[
+                randint(0, len(self.genres_df) - 1)
+            ]
+
+            artists_df, real_genre, related_genres = scrape_genre_page(random_genre)
+            random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
+
+            try:
+                response = requests.get(random_artist["preview_url"])
+            except Exception as e:
+                continue
+
+            if response.status_code != 200:
+                continue
+
+            print(f"Listen: {random_artist['preview_url']}")
+            print(real_genre)
+            print(related_genres)
+
+            rounds.append((random_artist, real_genre, related_genres))
+
+        return rounds
