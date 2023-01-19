@@ -22,7 +22,7 @@ from database.mysql_db import (
     get_player_by_id,
     get_all_rounds_from_player,
 )
-from game import Game, submit_guess
+from game import Game, submit_guess, split_genre
 from datetime import date
 
 
@@ -93,7 +93,8 @@ def guess():
 
     valid_rounds = get_all_rounds_from_player(cursor, player.id, empty_guess_only=True)
 
-    valid_rounds[0].genre
+    total_words = len(split_genre(valid_rounds[0].genre))
+
     resp = make_response(
         render_template(
             "guess.html",
@@ -101,6 +102,7 @@ def guess():
             round_type=player.round_type,
             points_total=player.total_score,
             artist_url=valid_rounds[0].artist_preview_url,
+            total_words=total_words,
         )
     )
     resp.set_cookie("round_id", value=str(valid_rounds[0].id))

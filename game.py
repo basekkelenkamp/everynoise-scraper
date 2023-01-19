@@ -28,9 +28,13 @@ class PlayerNotFoundError(Exception):
     pass
 
 
+def split_genre(genre) -> list:
+    return sorted(set(re.split(r"[ -]", genre)))
+
+
 def _calculate_points(guess: str, answer: str, related: list):
-    split_guess = sorted(set(re.split(r"[ -]", guess)))
-    split_answer = sorted(set(re.split(r"[ -]", answer)))
+    split_guess = split_genre(guess)
+    split_answer = split_genre(answer)
 
     if any(
         [
@@ -53,10 +57,12 @@ def _calculate_points(guess: str, answer: str, related: list):
             extra = len(split_guess) - len(split_answer)
             song_points -= int(((500 / len(split_answer)) * extra) / 2)
             message = message + f" {extra} extra word(s).."
+            if song_points < 0:
+                song_points = 0
         return song_points, message
 
     for related_genre in related:
-        split_related = sorted(set(re.split(r"[ -]", related_genre)))
+        split_related = split_genre(related_genre)
         if any(
             [
                 guess == related_genre,
@@ -70,7 +76,7 @@ def _calculate_points(guess: str, answer: str, related: list):
 
     for guess_part in split_guess:
         for related_genre in related:
-            if guess_part in related_genre.split(" "):
+            if guess_part in split_genre(related_genre):
                 song_points = 50
                 message = (
                     "You guessed part of a related genre. Here are some pity points."
