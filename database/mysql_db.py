@@ -39,7 +39,8 @@ def get_connection():
             "round_type VARCHAR(16) NOT NULL, "
             "name VARCHAR(64), "
             "total_score int DEFAULT 0, "
-            "total_rounds int DEFAULT 1)"
+            "total_rounds int DEFAULT 1,"
+            "daily_challenge_id int NULL)"
         )
 
         q2 = (
@@ -56,8 +57,18 @@ def get_connection():
             "artist_preview_url VARCHAR(200))"
         )
 
+        q3 = (
+            "CREATE TABLE daily_challenges ("
+            "id int PRIMARY KEY AUTO_INCREMENT, "
+            "date VARCHAR(100), "
+            "round_ids VARCHAR(100), "
+            "round_number int, "
+            "filter VARCHAR(200) default NULL)"
+        )
+
         cursor.execute(q1)
         cursor.execute(q2)
+        cursor.execute(q3)
 
     cursor.execute("SHOW TABLES")
     for x in cursor:
@@ -236,7 +247,8 @@ def get_all_round_type_highscores(cursor: Cursor, round_types: list):
     query_select_highscores = """
         SELECT * FROM players 
         WHERE round_type=%s 
-        AND name IS NOT NULL 
+        AND name IS NOT NULL
+        AND daily_challenge_id IS NULL
         ORDER BY total_score 
         DESC LIMIT 10
     """

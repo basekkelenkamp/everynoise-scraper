@@ -161,14 +161,7 @@ class Game:
 
         return random_artist, real_genre, related_genres
 
-    def generate_all_rounds(self, round_type):
-        try:
-            round_type = int(round_type)
-        except ValueError:
-            if round_type == ["daily_challenge"]:
-                round_type = 3
-            round_type = 5
-
+    def generate_all_rounds(self, round_type: int, filter=None):
         rounds = []
         while len(rounds) != round_type:
             random_genre: Series = self.genres_df.iloc[

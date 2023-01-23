@@ -60,7 +60,7 @@ def create_game():
     player_id = insert_player(cursor, cookie_id, round_type)
     player = get_player_by_id(cursor, player_id)
 
-    rounds_data = game.generate_all_rounds(round_type)
+    rounds_data = game.generate_all_rounds(int(round_type))
 
     for round_ in rounds_data:
         (artist, genre, related_genres) = round_
@@ -127,7 +127,7 @@ def answer():
     round_.points, message = submit_guess(round_)
 
     if not round_.guess:
-        round_.guess = 'skipped'
+        round_.guess = "skipped"
 
     cursor = db.cursor()
     player = get_player_by_cookie(cursor, cookie_id)
@@ -215,14 +215,27 @@ def match_details(player_id):
     )
 
 
-@app.route("/daily_challenge")
-def daily_challenge():
+@app.route("/create_daily_challenge")
+def create_daily_challenge():
     daily_date = request.cookies.get("daily_challenge")
 
     if daily_date and daily_date == str(date.today()):
         return redirect(url_for("index"))
     else:
         daily_date = str(date.today())
+
+    player_id = insert_player(cursor, cookie_id, daily_date)
+    player = get_player_by_id(cursor, player_id)
+    db.commit()
+
+    # check if daily_challenge for current day exist, if yes get it from db, if no create it
+
+    rounds_data = game.generate_all_rounds(5)
+
+    for round_ in rounds_data:
+        (artist, genre, related_genres) = round_
+        round_id = insert_round(cursor, player, related_genres, genre, artist)
+        print(round_id)
 
     resp = make_response(redirect(url_for("guess_daily", daily_date=daily_date)))
     resp.set_cookie("cookie_challenge_id", value=str(uuid4()))
@@ -240,14 +253,9 @@ def guess_daily(daily_date):
 
     cursor = db.cursor()
 
-    player = get_player_by_cookie(cursor, cookie_id)
-    if not player:
-        insert_player(cursor, cookie_id, daily_date)
-        db.commit()
-        player = get_player_by_cookie(cursor, cookie_id)
-        # get daily_challenge by daily_date
-        # if not:
-        #       game.init_new_daily_challenge
+    # get daily_challenge by daily_date
+    # if not:
+    #       game.init_new_daily_challenge
 
     # artist, genre, related_genres = game.init_new_round()
     # round_id = insert_round(cursor, player, related_genres, genre, artist)

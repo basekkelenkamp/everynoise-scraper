@@ -1,10 +1,6 @@
 # Genre Guesser todo list
 
 ## New features
-- improve points system
-- add database to save user match data
-- add leaderboard with different round modes:
-  - 10 rounds
-  - 30 rounds
-  - endless
-  - streak mode
+- streak mode
+- daily challenge
+- reverse points (start with 10.000 counting down)

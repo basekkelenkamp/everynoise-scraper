@@ -10,6 +10,7 @@ class Player:
     name: Optional[str]
     total_score: int
     total_rounds: int
+    daily_challenge_id: Optional[int]
 
 
 @dataclass
