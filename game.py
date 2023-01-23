@@ -178,12 +178,7 @@ class Game:
             artists_df, real_genre, related_genres = scrape_genre_page(random_genre)
             random_artist = artists_df.iloc[randint(0, len(artists_df) - 1)]
 
-            try:
-                response = requests.get(random_artist["preview_url"])
-            except Exception as e:
-                continue
-
-            if response.status_code != 200:
+            if not random_artist["preview_url"]:
                 continue
 
             print(f"Listen: {random_artist['preview_url']}")
