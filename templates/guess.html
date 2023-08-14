@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/guess.css') }}" crossorigin="anonymous">
 
     <h2>Game started</h2>
     <p>Points: <b>{{ points_total }}</b></p>
@@ -8,11 +9,10 @@
 
     <div>
         <div>
-            <img id="player-button" src="{{ url_for('static', filename='images/play.png') }}" onclick="audioHandler()">
+            <img class="audio-button" id="player-button" src="{{ url_for('static', filename='images/play.png') }}" onclick="audioHandler()">
             <br>
             <input type="range" id="volume-slider">
         </div>
-        <!-- <a href="{{ artist_url }}" target="_blank">Click here to listen</a> -->
         <br>
         <form class="guess-form" method="POST" action="{{ url_for('answer') }}">
             <input type="text" id="genre_guess" name="genre_guess" placeholder="guess the genre..">

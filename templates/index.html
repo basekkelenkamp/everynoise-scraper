@@ -1,19 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
 
- <form method="POST" action="{{ url_for('create_game') }}">
-  <h2>Select round type:</h2>
-  {% for round_type in round_types %}
-      <div class="round-type">
-        <input type="checkbox" name="box[1][]"  id="option{{loop.index}}" value="{{ round_type }}" {{ 'checked' if loop.index == 1 }}>
-        <label for="option{{loop.index}}">{{ round_type }}</label>  
-      </div>
-      <br>
+<div class="menu-wrapper">
 
-  {% endfor %}
-  <button type="submit" id="submit_button" name="submit_button">START</button>
-</form>
+  <form method="GET" action="#">
+    <div class="menu-item-wrapper">
+      <button class="coming-soon" data-text="🚧 coming soon!" id="survival_button" name="survival_button">SURVIVAL</button>
+    </div>
+  </form>
 
+  <form method="POST" action="{{ url_for('create_game') }}">
+    <div class="menu-item-wrapper start-button">
+      <button type="submit" id="submit_button" name="submit_button">START GAME</button>
+    </div>
+  </form>
+
+  <form method="GET" action="#">
+    <div class="menu-item-wrapper">
+      <button class="coming-soon" data-text="🚧 coming soon!" id="party_button" name="party_button">PARTY</button>
+    </div>
+  </form>
+
+</div>
 <script src="{{ url_for('static', filename='js/checkbox_handler.js') }}" crossorigin="anonymous"></script>
 
 {% endblock content %}

@@ -52,11 +52,11 @@ def index():
 
 @app.route("/create_game", methods=["POST"])
 def create_game():
-    round_type = request.form.get("box[1][]")
+    round_type = "5"
     cookie_id = str(uuid4())
 
-    if not round_type:
-        return redirect(url_for("index"))
+    # if not round_type:
+    #     return redirect(url_for("index"))
 
     cursor = db.cursor()
     player_id = insert_player(cursor, cookie_id, round_type)
