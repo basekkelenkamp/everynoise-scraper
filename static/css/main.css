@@ -1,26 +1,46 @@
 @font-face {
   font-family: caviar;
-  src: url(../css/fonts/caviar_dreams/CaviarDreams_Bold.ttf); }
+  src: url(../css/fonts/caviar_dreams/CaviarDreams_Bold.ttf);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  color: #ffffff;
+  font-family: caviar;
+  background-image: 
+  linear-gradient(rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.7 )), 
+  url('../images/background.jpg');
+  background-repeat: no-repeat; 
+  background-size: cover; 
+  background-position: center center; 
+  background-attachment: fixed; 
+}
 
 .header-link { 
-  color:inherit;
+  color: inherit;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.header-link:visited, 
+.header-link:hover, 
+.header-link:focus, 
+.header-link:active {
+  color: inherit;
   text-decoration: none;
 }
 
-.header-link:visited { text-decoration: none; color:inherit; }
-.header-link:hover { text-decoration: underline; color:inherit; }
-.header-link:focus { text-decoration: underline; color:inherit; }
-.header-link:hover, .header-link:active { text-decoration: underline; color:inherit }
-
-html {
-  font-size: 16px; }
-
-body {
-  color: #3a3a3a;
-  font-family: caviar; }
+.header-link:hover, 
+.header-link:focus {
+  color: #0073ff;
+}
 
 .bordered {
-  border: solid 1px #0073ff !important; }
+  border: solid 1px #0073ff !important;
+}
 
 button {
   background-color: white;
@@ -29,51 +49,56 @@ button {
   font-weight: bold;
   font-size: 1em;
   position: relative;
-  color: #0073ff; }
-  button:after {
-    content: '';
-    position: absolute;
-    background-color: #338fff;
-    top: 8px;
-    left: 8px;
-    right: -8px;
-    bottom: -8px;
-    z-index: -1; }
+  color: #0073ff;
+}
+
+button:after {
+  content: '';
+  position: absolute;
+  background-color: #338fff;
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: -1;
+}
 
 header {
   display: flex;
   align-items: center;
   padding: 1rem;
-  background-color: #222;
+  background-color: rgba(51,51,51,0.25);
   color: #fff;
-  border-radius: 0.5rem; }
-  header h1 {
-    margin: 0;
-    font-size: 3em;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.1rem;
-    flex-grow: 1; }
-  header .icon-container {
-    margin-left: 2rem;
-    text-align: right;
-    padding: 0.5em; }
+  border-radius: 0.5rem;
+  border: #333;
+  border-style: solid;
+  border-width: 2px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 3em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  flex-grow: 1;
+}
+
+header .icon-container {
+  margin-left: 2rem;
+  text-align: right;
+  padding: 0.5em;
+}
 
 form label {
-  font-size: 1.5em; }
+  font-size: 1.5em;
+}
 
 form input[type="checkbox"] {
   margin-right: 0.5em;
   flex-direction: row;
-  -ms-transform: scale(2);
-  /* IE */
-  -moz-transform: scale(2);
-  /* FF */
-  -webkit-transform: scale(2);
-  /* Safari and Chrome */
-  -o-transform: scale(2);
-  /* Opera */
-  transform: scale(2); }
+  transform: scale(2);
+}
 
 ul {
   list-style: none;
@@ -81,26 +106,37 @@ ul {
   padding: 0;
   display: flex;
   flex-direction: column;
-  align-items: center; }
-  ul li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 80%;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background-color: #222;
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.5rem; }
-    ul li:nth-child(1) {
-      background-color: #f44336; }
-    ul li:nth-child(2) {
-      background-color: #ff9800; }
-    ul li:nth-child(3) {
-      background-color: #ffeb3b; }
-    ul li:nth-child(n+4) {
-      background-color: #9e9e9e; }
+  align-items: center;
+}
+
+ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #222;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+ul li:nth-child(1) {
+  background-color: #f44336;
+}
+
+ul li:nth-child(2) {
+  background-color: #ff9800;
+}
+
+ul li:nth-child(3) {
+  background-color: #ffeb3b;
+}
+
+ul li:nth-child(n+4) {
+  background-color: #9e9e9e;
+}
 
 .guess-form {
   display: flex;
@@ -111,20 +147,24 @@ ul {
   box-sizing: border-box;
   border-radius: 0.5rem;
   background-color: #333;
-  color: #fff; }
-  .guess-form input[type="text"] {
-    flex: 1;
-    padding: 0.5em;
-    font-size: 1.25em;
-    border: none;
-    background-color: transparent;
-    color: inherit; }
-    .guess-form input[type="text"]:focus, .guess-form input[type="text"] input:focus {
-      outline: none; }
-  .guess-form input[type="submit"] {
-    padding: 0.5em 1em;
-    font-size: 1em;
-    background-color: #fff;
-    color: #333;
-    border: none;
-    cursor: pointer; }
+  color: #fff;
+}
+
+.guess-form input[type="text"] {
+  flex: 1;
+  padding: 0.5em;
+  font-size: 1.25em;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  outline: none;
+}
+
+.guess-form input[type="submit"] {
+  padding: 0.5em 1em;
+  font-size: 1em;
+  background-color: #fff;
+  color: #333;
+  border: none;
+  cursor: pointer;
+}
