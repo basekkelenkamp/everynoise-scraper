@@ -1,35 +1,35 @@
-{% extends "layout.html" %}
-{% block content %}
+{% extends "layout.html" %} {% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/answer.css') }}" crossorigin="anonymous">
 
-    <h2>Answer</h2>
-    <h4>Round: <b>{{ round_number }}</b></h4>
+<div class="main-wrapper">
+    <h2>Round: <b>{{ round_number }}</b></h2>
+    <p>{{ message }}</p>
 
-    <div>
-        <p>{{ message }}</p>
+    <div class="answer-info-wrapper">
         <p>Correct genre: {{ genre }}</p>
         <p>Your guess: {{ guess }}</p>
         <p>+{{ points }} points!</p>
     </div>
 
-    <div>
-        <p>Artist: {{ artist }}</p>
-        <a href="{{ spotify_link }}" target="_blank">Discover the artist</a>
+    <div class="artist-info-wrapper">
+        <div class="answer-info-wrapper">
+            <p>Artist: {{ artist }}</p>
+            <a href="{{ spotify_link }}" target="_blank">Discover the artist</a>
+        </div>
     </div>
 
     {% if not end %}
     <form method="POST" action="{{ url_for('guess') }}">
-      <input type="submit" name="submit_button" value="next round"/>
+        <input class="game-button" type="submit" name="submit_button" value="next round" />
+    </form>
+    {% endif %} {% if end %}
+    <form class="submit-score-form" method="POST" action="{{ url_for('submit_score') }}">
+        <input type="text" name="name" placeholder="name.." required/>
+        <input class="game-button" type="submit" name="submit_score" value="submit_score" />
     </form>
     {% endif %}
 
-    {% if end %}
-    <form method="POST" action="{{ url_for('submit_score') }}">
-      <input type="text" name="name" placeholder="name.." required/>
-      <input type="submit" name="submit_score" value="submit_score"/>
-    </form>
-
-    {% endif %}
-
+</div>
 
 
 {% endblock content %}

@@ -59,6 +59,24 @@ button:hover {
   cursor: pointer;
 }
 
+.game-button {
+  background-color: white;
+  color: black;
+  padding: 1em 3em;
+  font-weight: bold;
+  font-size: 1em;
+  transition: 0.15s;
+  border: none;
+  border-radius: 3px;
+}
+
+.game-button:hover {
+  background-color: black;
+  color: white;
+  cursor: pointer;
+}
+
+
 header {
   display: flex;
   align-items: center;

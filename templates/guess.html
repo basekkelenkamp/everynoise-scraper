@@ -9,15 +9,18 @@
 </div>
 
 <div>
-    <div>
+    <div class="audio-button-wrapper">
         <img class="audio-button" id="player-button" src="{{ url_for('static', filename='images/play.png') }}" onclick="audioHandler()">
-        <br>
-        <input type="range" id="volume-slider">
     </div>
+
+    <div class="volume-slider-wrapper">
+        <input type="range" id="volume-slider" class="slider">
+    </div>
+
     <br>
     <form class="guess-form" method="POST" action="{{ url_for('answer') }}">
         <input type="text" id="genre_guess" name="genre_guess" placeholder="guess the genre..">
-        <input type="submit" name="submit_button" value="skip"/>
+        <input class="game-button" type="submit" name="submit_button" value="skip"/>
     </form>
 </div>
 
