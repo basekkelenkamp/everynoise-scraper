@@ -2,23 +2,24 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/guess.css') }}" crossorigin="anonymous">
 
-    <h2>Game started</h2>
-    <p>Points: <b>{{ points_total }}</b></p>
+<div class="guess-info-wrapper">
     <p>Round: <b>{{ round_number }} / {{ round_type }}</b></p>
+    <p>Points: <b>{{ points_total }}</b></p>
     <p>Total words: <b>{{ total_words }}</b></p>
+</div>
 
+<div>
     <div>
-        <div>
-            <img class="audio-button" id="player-button" src="{{ url_for('static', filename='images/play.png') }}" onclick="audioHandler()">
-            <br>
-            <input type="range" id="volume-slider">
-        </div>
+        <img class="audio-button" id="player-button" src="{{ url_for('static', filename='images/play.png') }}" onclick="audioHandler()">
         <br>
-        <form class="guess-form" method="POST" action="{{ url_for('answer') }}">
-            <input type="text" id="genre_guess" name="genre_guess" placeholder="guess the genre..">
-            <input type="submit" name="submit_button" value="skip"/>
-        </form>
+        <input type="range" id="volume-slider">
     </div>
+    <br>
+    <form class="guess-form" method="POST" action="{{ url_for('answer') }}">
+        <input type="text" id="genre_guess" name="genre_guess" placeholder="guess the genre..">
+        <input type="submit" name="submit_button" value="skip"/>
+    </form>
+</div>
 
 <div hidden id="audioSelector" data-artistUrl="{{ artist_url }}"></div>
 <script src="{{ url_for('static', filename='js/player.js') }}" crossorigin="anonymous"></script>
