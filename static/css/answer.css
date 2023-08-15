@@ -61,3 +61,26 @@
     border: none;
     cursor: pointer;
 }
+
+@media (max-width: 768px) {
+    .answer-info-wrapper,
+    .artist-info-wrapper,
+    .submit-score-form {
+        width: 90%;
+        flex-direction: column;
+        align-items: center;
+        /* center align items for better visual alignment on mobile */
+    }
+    .answer-info-wrapper p,
+    .artist-info-wrapper p {
+        margin-left: 5%;
+        /* reduced the margins slightly for a better fit on small screens */
+        margin-right: 5%;
+    }
+    .submit-score-form input[type="text"],
+    .submit-score-form input[type="submit"] {
+        width: 100%;
+        margin-bottom: 0.5em;
+        /* space between the items when they stack */
+    }
+}

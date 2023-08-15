@@ -1,164 +1,184 @@
 @font-face {
-  font-family: caviar;
-  src: url(../css/fonts/caviar_dreams/CaviarDreams_Bold.ttf);
+    font-family: caviar;
+    src: url(../css/fonts/caviar_dreams/CaviarDreams_Bold.ttf);
 }
 
 html {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 body {
-  color: #ffffff;
-  font-family: caviar;
-  background-image: 
-  linear-gradient(rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.7 )), 
-  url('../images/background.jpg');
-  background-repeat: no-repeat; 
-  background-size: cover; 
-  background-position: center center; 
-  background-attachment: fixed; 
+    color: #ffffff;
+    font-family: caviar;
+    background-image: linear-gradient(rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.7)), url('../images/background.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
 }
 
-.header-link { 
-  color: inherit;
-  text-decoration: none;
-  transition: 0.3s;
+.header-link {
+    color: inherit;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
-.header-link:visited, 
-.header-link:hover, 
-.header-link:focus, 
+.header-link:visited,
+.header-link:hover,
+.header-link:focus,
 .header-link:active {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
-.header-link:hover, 
+.header-link:hover,
 .header-link:focus {
-  color: #0073ff;
+    color: #0073ff;
 }
 
 .bordered {
-  border: solid 1px #0073ff !important;
+    border: solid 1px #0073ff !important;
 }
 
 button {
-  background-color: white;
-  color: black;
-  padding: 1em 3em;
-  font-weight: bold;
-  font-size: 1em;
-  transition: 0.3s;
-  border: none;
-  border-radius: 3px;
+    background-color: white;
+    color: black;
+    padding: 1em 3em;
+    font-weight: bold;
+    font-size: 1em;
+    transition: 0.3s;
+    border: none;
+    border-radius: 3px;
 }
 
 button:hover {
-  background-color: black;
-  color: white;
-  cursor: pointer;
+    background-color: black;
+    color: white;
+    cursor: pointer;
 }
 
 .game-button {
-  background-color: white;
-  color: black;
-  padding: 1em 3em;
-  font-weight: bold;
-  font-size: 1em;
-  transition: 0.15s;
-  border: none;
-  border-radius: 3px;
+    background-color: white;
+    color: black;
+    padding: 1em 3em;
+    font-weight: bold;
+    font-size: 1em;
+    transition: 0.15s;
+    border: none;
+    border-radius: 3px;
 }
 
 .game-button:hover {
-  background-color: black;
-  color: white;
-  cursor: pointer;
+    background-color: black;
+    color: white;
+    cursor: pointer;
 }
 
-
 header {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  background-color: rgba(51,51,51,0.25);
-  color: #fff;
-  border-radius: 0.5rem;
-  border: #333;
-  border-style: solid;
-  border-width: 2px;
-  margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(51, 51, 51, 0.25);
+    color: #fff;
+    border-radius: 0.5rem;
+    border: #333;
+    border-style: solid;
+    border-width: 2px;
+    margin-bottom: 25px;
 }
 
 header h1 {
-  margin: 0;
-  font-size: 3em;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  flex-grow: 1;
+    margin: 0;
+    font-size: 3em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    flex-grow: 1;
 }
 
 header .icon-container {
-  margin-left: 2rem;
-  text-align: right;
-  padding: 0.5em;
+    margin-left: 2rem;
+    text-align: right;
+    padding: 0.5em;
 }
 
 form label {
-  font-size: 1.5em;
+    font-size: 1.5em;
 }
 
+
 /* START MENU */
+
 .menu-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* margin-top: 25px; */
-  margin-left: 50px;
-  margin-right: 50px;
-  padding: 1rem;
-  background-color: rgba(51,51,51,0.25);
-  color: #fff;
-  border-radius: 0.5rem;
-  border: #333;
-  border-style: solid;
-  border-width: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 25px; */
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 1rem;
+    background-color: rgba(51, 51, 51, 0.25);
+    color: #fff;
+    border-radius: 0.5rem;
+    border: #333;
+    border-style: solid;
+    border-width: 2px;
 }
 
 .menu-item-wrapper {
-  display: inline-grid;
-  vertical-align: middle;
-  margin: 2rem;
-  text-align: center;
-  padding: 10px;
-  grid-gap: 3px;
+    display: inline-grid;
+    vertical-align: middle;
+    margin: 2rem;
+    text-align: center;
+    padding: 10px;
+    grid-gap: 3px;
 }
 
 .start-button {
-  font-size: 120%;
+    font-size: 120%;
 }
 
 button.coming-soon {
-  position: relative;
-  overflow: hidden;
+    position: relative;
+    overflow: hidden;
 }
 
 button.coming-soon:hover::before {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: gray;
-  color: white;
-  cursor: default;
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: gray;
+    color: white;
+    cursor: default;
 }
 
 button.coming-soon:hover {
-  color: transparent;
+    color: transparent;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 0;
+    }
+    header .icon-container {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-wrapper {
+        flex-direction: column;
+    }
+    .menu-item-wrapper {
+        margin: 1rem 0;
+    }
 }

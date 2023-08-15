@@ -9,9 +9,9 @@
     color: #fff;
     width: 50%;
     margin: auto;
-  }
-  
-  .guess-form input[type="text"] {
+}
+
+.guess-form input[type="text"] {
     flex: 1;
     padding: 0.5em;
     font-size: 1.25em;
@@ -19,95 +19,114 @@
     background-color: transparent;
     color: inherit;
     outline: none;
-  }
-  
-  .guess-form input[type="submit"] {
+}
+
+.guess-form input[type="submit"] {
     padding: 0.5em 1em;
     font-size: 1em;
     background-color: #fff;
     color: #333;
     border: none;
     cursor: pointer;
-  }
-  
+}
+
 .audio-button {
     -webkit-filter: invert(100%);
     filter: invert(100%);
 }
 
 .audio-button-wrapper {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .volume-slider-wrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
 }
 
 .slider {
-  -webkit-appearance: none;
-  width: 30%;
-  height: 10px;
-  outline: none;
-  opacity: 0.4;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-  border-radius: 3px;
+    -webkit-appearance: none;
+    width: 30%;
+    height: 10px;
+    outline: none;
+    opacity: 0.4;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    border-radius: 3px;
 }
 
 .slider:hover {
-  opacity: 1;
+    opacity: 1;
 }
 
 .slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #0073ff;
-  cursor: pointer;
-  border-radius: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #0073ff;
+    cursor: pointer;
+    border-radius: 3px;
 }
 
 .slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
-  background: #0073ff;
-  cursor: pointer;
+    width: 25px;
+    height: 25px;
+    background: #0073ff;
+    cursor: pointer;
 }
 
-
 .guess-info-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* margin-top: 25px; */
-  margin: auto;
-  width: 75%;
-  background-color: rgba(51,51,51,0.25);
-  color: #fff;
-  border-radius: 0.5rem;
-  border: #333;
-  border-style: solid;
-  border-width: 2px;
-  margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 25px; */
+    margin: auto;
+    width: 75%;
+    background-color: rgba(51, 51, 51, 0.25);
+    color: #fff;
+    border-radius: 0.5rem;
+    border: #333;
+    border-style: solid;
+    border-width: 2px;
+    margin-bottom: 25px;
 }
 
 .guess-info-wrapper p {
-  margin-left: 7.5%;
-  margin-right: 7.5%;
+    margin-left: 7.5%;
+    margin-right: 7.5%;
 }
 
-
 #visualizer {
-  background: none;
-  z-index: -1;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+    background: none;
+    z-index: -1;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .guess-form {
+        flex-direction: column;
+        width: 90%;
+        /* adjusted width for smaller screens */
+    }
+    .guess-form input[type="text"],
+    .guess-form input[type="submit"] {
+        width: 100%;
+        margin-bottom: 0.5em;
+        /* give some space between stacked items */
+    }
+    .slider {
+        width: 70%;
+    }
+    .guess-info-wrapper {
+        width: 90%;
+        /* adjusted width for smaller screens */
+    }
 }
