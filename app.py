@@ -42,7 +42,11 @@ app = Flask(__name__)
 db = get_connection()
 game = Game()
 
-ROUND_TYPES = ["5", "10", "30"]
+ROUND_TYPES = [
+    "5",
+    # "10",
+    # "30"
+]
 
 
 @app.route("/")
@@ -176,13 +180,13 @@ def leaderboards(round_type=5, id_=None):
     print(id_, round_type)
 
     cursor = db.cursor()
-    round_type_highscores = get_all_round_type_highscores(cursor, ROUND_TYPES)
+    main_high_scores = get_all_round_type_highscores(cursor, ROUND_TYPES)[0]['data']
 
     return render_template(
         "leaderboards.html",
         player_id=id_,
         current_round_type=round_type,
-        round_type_data=round_type_highscores,
+        main_high_scores=main_high_scores,
     )
 
 

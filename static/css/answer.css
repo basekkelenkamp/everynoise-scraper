@@ -84,3 +84,10 @@
         /* space between the items when they stack */
     }
 }
+
+.discover-button {
+    text-decoration: none;
+    text-align: center;
+    padding: 0.4em;
+    font-size: 80%;
+}

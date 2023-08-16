@@ -1,21 +1,18 @@
-{% extends "layout.html" %}
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/leaderboard.css') }}" crossorigin="anonymous">
 
+<div class="main-wrapper">
     <h2>Leaderboards</h2>
- <form method="GET" action="{{ url_for('index') }}">
-  <button type="submit" id="submit_button" name="submit_button">play again?</button>
-</form>
+    <form method="GET" action="{{ url_for('index') }}">
+        <button type="submit" id="submit_button" name="submit_button">play again?</button>
+    </form>
 
-{% for round_type in round_type_data %}
-    <h2>{{ round_type.round_type }} Rounds</h2>
-    <div id={{ round_type.round_type }}>
-    <ul>
-    {% for row in round_type.data %}
-        <li># {{loop.index}} {{ row.name }} | Score: {{ row.score }} |<a href="{{ url_for('match_details', player_id=row.id) }}">details</a></li>
-    {% endfor %}
-    </ul>
+    <div class="scores" id={{ "5" }}>
+        <ul>
+            {% for row in main_high_scores %}
+            <li># {{loop.index}} {{ row.name }} | Score: {{ row.score }} <a href="{{ url_for('match_details', player_id=row.id) }}" class="game-button">details</a></li>
+            {% endfor %}
+        </ul>
     </div>
-{% endfor %}
-
+</div>
 {% endblock content %}
