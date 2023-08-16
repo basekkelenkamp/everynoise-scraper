@@ -1,0 +1,25 @@
+{% extends "layout.html" %} {% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/party.css') }}" crossorigin="anonymous">
+
+<div class="main-wrapper">
+
+    <form class="party-form" method="POST" action="{{ url_for('create_party') }}">
+        <p>Send this party code to your friends!</p>
+        <input type="text" id="party_code" name="party_code" value="{{ party_code }}" readonly>
+        <div class="menu-item-wrapper create-party-button">
+            <button type="submit" id="submit_button" name="submit_button">CREATE PARTY</button>
+        </div>
+    </form>
+
+    <form class="party-form" method="POST" action="{{ url_for('join_party') }}">
+        <p>Connect to a friend's party!</p>
+        <input type="text" id="party_code" name="party_code" placeholder="insert party code..">
+        <div class="menu-item-wrapper create-party-button">
+            <button type="submit" id="submit_button" name="submit_button">JOIN PARTY</button>
+        </div>
+    </form>
+
+</div>
+<script src="{{ url_for('static', filename='js/checkbox_handler.js') }}" crossorigin="anonymous"></script>
+
+{% endblock content %}
