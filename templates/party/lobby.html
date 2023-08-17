@@ -1,0 +1,36 @@
+{% extends "layout.html" %} 
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/party.css') }}" crossorigin="anonymous">
+
+<div class="main-wrapper">
+
+    <form class="party-form" method="POST" action="{{ url_for('create_party') }}">
+        <p>Send this party code to your friends!</p>
+        <input type="text" id="party_code" name="party_code" value="{{ party_code }}" readonly>
+        <div class="menu-item-wrapper create-party-button">
+            <button type="submit" id="submit_button" name="submit_button">START GAME</button>
+        </div>
+    </form>
+
+    <div class="player-slots-container party-form">
+        {% for i in range(user_limit) %}
+        <div class="player-slot">
+            {% if loop.first %}
+            <input type="text" class="player-name-input" placeholder="Enter nickname">
+            <label class="ready-checkbox-container">
+                Ready
+                <input type="checkbox" class="ready-checkbox">
+                <span class="checkmark"></span>
+            </label>
+            {% else %}
+            <input type="text" class="player-name-input" placeholder="player {{ i+1 }}" readonly>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+<script src="{{ url_for('static', filename='js/checkbox_handler.js') }}" crossorigin="anonymous"></script>
+
+{% endblock content %}

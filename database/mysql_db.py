@@ -39,8 +39,8 @@ def get_connection():
             "round_type VARCHAR(16) NOT NULL, "
             "name VARCHAR(64), "
             "total_score int DEFAULT 0, "
-            "total_rounds int DEFAULT 1,"
-            "daily_challenge_id int NULL)"
+            "total_rounds int DEFAULT 1, "
+            "party_code VARCHAR(8) NULL)"
         )
 
         q2 = (
@@ -54,7 +54,8 @@ def get_connection():
             "related_genres VARCHAR(2500), "
             "artist_name VARCHAR(200), "
             "artist_spotify VARCHAR(200), "
-            "artist_preview_url VARCHAR(200))"
+            "artist_preview_url VARCHAR(200), "
+            "party_code VARCHAR(8) NULL)"
         )
 
         cursor.execute(q1)
@@ -66,7 +67,8 @@ def get_connection():
 
     alter_table = False
     if alter_table:
-        cursor.execute("DROP TABLE IF EXISTS daily_challenges")
+        drop_column_query = "ALTER TABLE players DROP COLUMN daily_challenge_id;"
+        cursor.execute(drop_column_query)
         breakpoint()
 
     # Remove players by name and its rounds
@@ -243,7 +245,6 @@ def get_all_round_type_highscores(cursor: Cursor, round_types: list):
         SELECT * FROM players 
         WHERE round_type=%s 
         AND name IS NOT NULL
-        AND daily_challenge_id IS NULL
         ORDER BY total_score 
         DESC LIMIT 10
     """

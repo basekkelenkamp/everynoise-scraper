@@ -25,39 +25,27 @@ from database.mysql_db import (
 from game import Game, submit_guess, split_genre
 from datetime import date
 
-# import logging as logger
-# from util.assets import bundles
-# from flask_assets import Environment
+from utils.pusher import init_pusher
+
 
 app = Flask(__name__)
 
-# assets = Environment(app)
-# assets.manifest = False
-# assets.cache = False
-# assets.register(bundles)
-
 db = get_connection()
 game = Game()
+pusher = init_pusher()
 
-ROUND_TYPES = [
-    "5",
-    # "10",
-    # "30"
-]
+ROUND_TYPES = ["5"]
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", round_types=ROUND_TYPES)
+    return render_template("main/index.html", round_types=ROUND_TYPES)
 
 
 @app.route("/create_game", methods=["POST"])
 def create_game():
     round_type = "5"
     cookie_id = str(uuid4())
-
-    # if not round_type:
-    #     return redirect(url_for("index"))
 
     cursor = db.cursor()
     player_id = insert_player(cursor, cookie_id, round_type)
@@ -100,7 +88,7 @@ def guess():
 
     resp = make_response(
         render_template(
-            "guess.html",
+            "main/guess.html",
             round_number=player.total_rounds,
             round_type=player.round_type,
             points_total=player.total_score,
@@ -148,7 +136,7 @@ def answer():
     cursor.close()
 
     # unpacking: rounds, points, guess, genre, artist, spotify_link, message
-    resp = make_response(render_template("answer.html", **answer_dict, end=end))
+    resp = make_response(render_template("main/answer.html", **answer_dict, end=end))
     resp.set_cookie("round_id", expires=0)
     return resp
 
@@ -180,7 +168,7 @@ def leaderboards(round_type=5, id_=None):
     main_high_scores = get_all_round_type_highscores(cursor, ROUND_TYPES)[0]["data"]
 
     return render_template(
-        "leaderboards.html",
+        "leaderboards/leaderboards.html",
         player_id=id_,
         current_round_type=round_type,
         main_high_scores=main_high_scores,
@@ -210,7 +198,7 @@ def match_details(player_id):
         return redirect(url_for("index"))
 
     return render_template(
-        "match_details.html",
+        "leaderboards/match_details.html",
         name=player.name,
         score=player.total_score,
         rounds=rounds_dict,
@@ -220,18 +208,15 @@ def match_details(player_id):
 @app.route("/party")
 def party():
     party_code = str(uuid4()).replace("-", "")[0:16]
-    return render_template("party.html", party_code=party_code)
+    return render_template("party/party.html", party_code=party_code)
 
 
 @app.route("/create_party", methods=["POST"])
 def create_party():
-    party_code = request.form.get("party_code")
+    party_code = str(uuid4()).replace("-", "")[0:16]
 
-    if not party_code:
-        return render_template("index.html")
-
-    breakpoint()
-    return render_template("party.html")
+    # Save party code in DB
+    return render_template("party/lobby.html", party_code=party_code, user_limit=6)
 
 
 @app.route("/join_party", methods=["POST"])
@@ -239,8 +224,9 @@ def join_party():
     party_code = request.form.get("party_code")
 
     if not party_code:
-        party_code = str(uuid4()).replace("-", "")[0:16]
-        return render_template("party.html", party_code=party_code)
+        return render_template("party/party.html")
 
+    # Check if party_code exists in DB
     breakpoint()
-    return render_template("party.html")
+    return render_template("party/party.html")
+
