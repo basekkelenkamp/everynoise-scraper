@@ -36,12 +36,3 @@ class Round:
             "spotify_link": self.artist_spotify,
             "message": None,
         }
-
-
-@dataclass
-class DailyChallenge:
-    id: str
-    date: str
-    round_ids: str
-    round_number: int
-    filter: Optional[str]

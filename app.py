@@ -21,9 +21,6 @@ from database.mysql_db import (
     insert_player,
     get_player_by_id,
     get_all_rounds_from_player,
-    get_daily_challenge_by_date,
-    insert_daily_challenge,
-    update_player_daily_challenge_id,
 )
 from game import Game, submit_guess, split_genre
 from datetime import date
@@ -180,7 +177,7 @@ def leaderboards(round_type=5, id_=None):
     print(id_, round_type)
 
     cursor = db.cursor()
-    main_high_scores = get_all_round_type_highscores(cursor, ROUND_TYPES)[0]['data']
+    main_high_scores = get_all_round_type_highscores(cursor, ROUND_TYPES)[0]["data"]
 
     return render_template(
         "leaderboards.html",
@@ -228,24 +225,22 @@ def party():
 
 @app.route("/create_party", methods=["POST"])
 def create_party():
-    party_code = request.form.get('party_code')
+    party_code = request.form.get("party_code")
 
     if not party_code:
         return render_template("index.html")
-    
+
     breakpoint()
     return render_template("party.html")
 
 
 @app.route("/join_party", methods=["POST"])
 def join_party():
-    party_code = request.form.get('party_code')
+    party_code = request.form.get("party_code")
 
     if not party_code:
         party_code = str(uuid4()).replace("-", "")[0:16]
         return render_template("party.html", party_code=party_code)
-    
 
     breakpoint()
     return render_template("party.html")
-

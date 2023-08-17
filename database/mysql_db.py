@@ -2,7 +2,7 @@ import json
 from dotenv import load_dotenv
 from os import getenv
 
-from database.models import Player, Round, DailyChallenge
+from database.models import Player, Round
 
 import pymysql
 from pymysql.cursors import Cursor
@@ -57,18 +57,8 @@ def get_connection():
             "artist_preview_url VARCHAR(200))"
         )
 
-        q3 = (
-            "CREATE TABLE daily_challenges ("
-            "id int PRIMARY KEY AUTO_INCREMENT, "
-            "date VARCHAR(100) UNIQUE, "
-            "round_ids VARCHAR(100), "
-            "round_number int, "
-            "filter VARCHAR(200) default NULL)"
-        )
-
         cursor.execute(q1)
         cursor.execute(q2)
-        cursor.execute(q3)
 
     cursor.execute("SHOW TABLES")
     for x in cursor:
@@ -77,16 +67,6 @@ def get_connection():
     alter_table = False
     if alter_table:
         cursor.execute("DROP TABLE IF EXISTS daily_challenges")
-
-        q3 = (
-            "CREATE TABLE daily_challenges ("
-            "id int PRIMARY KEY AUTO_INCREMENT, "
-            "date VARCHAR(100) UNIQUE, "
-            "round_ids VARCHAR(100), "
-            "round_number int, "
-            "filter VARCHAR(200) default NULL)"
-        )
-        cursor.execute(q3)
         breakpoint()
 
     # Remove players by name and its rounds
@@ -284,34 +264,3 @@ def get_all_round_type_highscores(cursor: Cursor, round_types: list):
         highscores.append(highscore)
 
     return highscores
-
-
-def get_daily_challenge_by_date(cursor: Cursor, date: str):
-    query_select_daily = """SELECT * FROM daily_challenges WHERE date = %s"""
-    cursor.execute(query_select_daily, [date])
-    x = cursor.fetchone()
-
-    if not x:
-        return None
-    else:
-        return DailyChallenge(*x)
-
-
-def insert_daily_challenge(
-    cursor: Cursor, date: str, round_ids: str, round_number: int, filter=None
-):
-    query_insert_daily = """INSERT INTO daily_challenges (date, round_ids, round_number, filter) VALUES (%s, %s, %s, %s)"""
-    cursor.execute(query_insert_daily, [date, round_ids, round_number, filter])
-    return cursor.lastrowid
-
-
-def update_player_daily_challenge_id(
-    cursor: Cursor, player_id: str, daily_challenge_id: str
-):
-    query_update_player = """
-        UPDATE players SET 
-        daily_challenge_id = %s 
-        WHERE id = %s
-    """
-
-    cursor.execute(query_update_player, [daily_challenge_id, player_id])
