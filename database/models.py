@@ -11,6 +11,8 @@ class Player:
     total_score: int
     total_rounds: int
     party_code: Optional[str] = None
+    party_state: Optional[str] = None
+
 
 
 @dataclass
@@ -37,3 +39,11 @@ class Round:
             "spotify_link": self.artist_spotify,
             "message": None,
         }
+
+
+@dataclass
+class PartyGame:
+    party_code: str
+    game_started: bool
+    finished_rounds: int
+    total_players: int

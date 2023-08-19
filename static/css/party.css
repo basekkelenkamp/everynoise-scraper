@@ -23,18 +23,95 @@
     margin: 0.2rem;
 }
 
-.party-form input[type="text"] {
+.player-name-input {
     margin: 0.5em;
-    width: 75%;
     padding: 0.75em;
+}
+
+.party-form input[type="text"] {
+    width: 75%;
     background-color: transparent;
     color: inherit;
     text-align: center;
     font-size: 110%;
 }
 
+.ready-toggle-button {
+    background-color: red;
+    color: #fff;
+    padding: 0.5em 1em;
+    margin: 0.5em;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 120px;
+    font-size: 90%;
+    text-align: center;
+}
+
+.ready-toggle-button:hover {
+    background-color: darkred;
+}
+
+.ready-toggle-button.active {
+    background-color: green;
+    box-shadow: 0 0 5px rgba(0, 128, 0, 0.5);
+}
+
 @media (max-width: 768px) {
     .party-form {
         width: 75%;
     }
+}
+
+.enter-name {
+    display: flex;
+}
+
+.player-slot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0.3rem;
+    padding: 0.2em 0.6em;
+    margin: 0.1em 0;
+}
+
+.player-slot.empty {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px dashed #888;
+    color: #aaa;
+}
+
+.player-slot.empty .player-name {
+    color: #888;
+}
+
+.player-slot.joined, .player-slot.host, .player-slot.enter-name {
+    background-color: rgba(51, 51, 51, 0.5);
+    border: 1px solid #333;
+    color: #fff;
+}
+
+.enter-name {
+    background-color: rgba(51, 51, 51, 0.75);
+}
+
+.player-slots-container {
+    width: 60%;
+    margin: 0 auto;
+    max-width: 500px;
+    max-height: 80vh; 
+    overflow-y: auto;
+}
+
+.player-slot {
+    padding: 0.2em 0.6em; 
+    margin: 0.1em 0;
+}
+
+.player-name {
+    padding: 5px;
+    margin: 0;
 }

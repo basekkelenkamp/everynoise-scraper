@@ -12,24 +12,21 @@
         </div>
     </form>
 
+    <div class="party-form">
+        <div class="player-slot enter-name">
+            <input type="text" class="player-name-input" placeholder="Enter nickname">
+            <button class="ready-toggle-button">Not Ready</button>
+        </div>
+    </div>
+    
     <div class="player-slots-container party-form">
         {% for i in range(user_limit) %}
-        <div class="player-slot">
-            {% if loop.first %}
-            <input type="text" class="player-name-input" placeholder="Enter nickname">
-            <label class="ready-checkbox-container">
-                Ready
-                <input type="checkbox" class="ready-checkbox">
-                <span class="checkmark"></span>
-            </label>
-            {% else %}
-            <input type="text" class="player-name-input" placeholder="player {{ i+1 }}" readonly>
-            {% endif %}
-
+        <div class="player-slot {% if loop.first %}host{% else %}empty{% endif %}">
+            <input type="text" class="player-name" placeholder="player {{ i+1 }}" readonly>
         </div>
         {% endfor %}
     </div>
-
+    
 </div>
 <script src="{{ url_for('static', filename='js/checkbox_handler.js') }}" crossorigin="anonymous"></script>
 
