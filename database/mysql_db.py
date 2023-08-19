@@ -2,7 +2,7 @@ import json
 from dotenv import load_dotenv
 from os import getenv
 
-from database.models import Player, Round
+from database.models import PartyGame, Player, Round
 
 import pymysql
 from pymysql.cursors import Cursor
@@ -40,7 +40,8 @@ def get_connection():
             "name VARCHAR(64), "
             "total_score int DEFAULT 0, "
             "total_rounds int DEFAULT 1, "
-            "party_code VARCHAR(8) NULL)"
+            "party_code VARCHAR(8) NULL, "
+            "party_state VARCHAR(32) NULL)"  # New column
         )
 
         q2 = (
@@ -58,8 +59,17 @@ def get_connection():
             "party_code VARCHAR(8) NULL)"
         )
 
+        q3 = (
+            "CREATE TABLE party_games ("
+            "party_code VARCHAR(8) PRIMARY KEY, "
+            "game_started BOOLEAN DEFAULT FALSE, "
+            "finished_rounds int DEFAULT 0, "
+            "total_players int DEFAULT 0)"
+        )
+
         cursor.execute(q1)
         cursor.execute(q2)
+        cursor.execute(q3)
 
     cursor.execute("SHOW TABLES")
     for x in cursor:
@@ -67,8 +77,17 @@ def get_connection():
 
     alter_table = False
     if alter_table:
-        drop_column_query = "ALTER TABLE players DROP COLUMN daily_challenge_id;"
-        cursor.execute(drop_column_query)
+        alter_query_players = (
+            "ALTER TABLE players MODIFY COLUMN party_code VARCHAR(32);"
+        )
+        cursor.execute(alter_query_players)
+
+        # Altering for party_games table (assuming you've created it from previous steps)
+        alter_query_party_games = (
+            "ALTER TABLE party_games MODIFY COLUMN party_code VARCHAR(32);"
+        )
+        cursor.execute(alter_query_party_games)
+
         breakpoint()
 
     # Remove players by name and its rounds
@@ -265,3 +284,29 @@ def get_all_round_type_highscores(cursor: Cursor, round_types: list):
         highscores.append(highscore)
 
     return highscores
+
+
+def insert_party(cursor: Cursor, party_code: str):
+    query_insert_party = """INSERT INTO party_games (party_code) VALUES (%s)"""
+    cursor.execute(query_insert_party, [party_code])
+    return
+
+
+def get_party_by_party_code(cursor: Cursor, party_code: str):
+    query_select_party_game = """SELECT * FROM party_games WHERE party_code = %s"""
+    cursor.execute(query_select_party_game, [party_code])
+    result = cursor.fetchone()
+
+    breakpoint()
+    if result:
+        return PartyGame(*result)
+    else:
+        return None
+
+
+def insert_party_player(cursor: Cursor, cookie_id: str, round_type: str):
+    query_insert_player = (
+        """INSERT INTO players (cookie_id, round_type) VALUES (%s, %s)"""
+    )
+    cursor.execute(query_insert_player, [cookie_id, round_type])
+    return cursor.lastrowid

@@ -1,4 +1,6 @@
 import json
+from os import curdir
+from sqlite3 import Cursor
 from uuid import uuid4
 from flask import (
     Flask,
@@ -11,7 +13,9 @@ from flask import (
 
 from database.mysql_db import (
     get_connection,
+    get_party_by_party_code,
     get_player_by_cookie,
+    insert_party,
     insert_round,
     get_round_by_id,
     update_round,
@@ -215,8 +219,12 @@ def party():
 def create_party():
     party_code = str(uuid4()).replace("-", "")[0:16]
 
-    # Save party code in DB
-    return render_template("party/lobby.html", party_code=party_code, user_limit=6)
+    cursor = db.cursor()
+    insert_party(cursor, party_code)
+
+    return render_template(
+        "party/lobby.html", party_code=party_code, user_limit=6, is_host=True
+    )
 
 
 @app.route("/join_party", methods=["POST"])
@@ -226,7 +234,12 @@ def join_party():
     if not party_code:
         return render_template("party/party.html")
 
-    # Check if party_code exists in DB
-    breakpoint()
-    return render_template("party/party.html")
+    cursor = db.cursor()
+    party_game = get_party_by_party_code(cursor, party_code)
 
+    if not party_game or party_game.game_started:
+        return render_template("party/party.html")
+
+    return render_template(
+        "party/lobby.html", party_code=party_code, user_limit=6, is_host=False
+    )

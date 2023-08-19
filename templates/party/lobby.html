@@ -8,7 +8,11 @@
         <p>Send this party code to your friends!</p>
         <input type="text" id="party_code" name="party_code" value="{{ party_code }}" readonly>
         <div class="menu-item-wrapper create-party-button">
-            <button type="submit" id="submit_button" name="submit_button">START GAME</button>
+            {% if is_host %}
+                <button type="submit" id="submit_button" name="submit_button">START GAME</button>
+            {% else %}
+                <button type="button" id="waiting_button" disabled>waiting for host</button>
+            {% endif %}
         </div>
     </form>
 
@@ -21,13 +25,11 @@
     
     <div class="player-slots-container party-form">
         {% for i in range(user_limit) %}
-        <div class="player-slot {% if loop.first %}host{% else %}empty{% endif %}">
+        <div class="player-slot {% if loop.first %}self{% else %}empty{% endif %}">
             <input type="text" class="player-name" placeholder="player {{ i+1 }}" readonly>
         </div>
         {% endfor %}
     </div>
     
 </div>
-<script src="{{ url_for('static', filename='js/checkbox_handler.js') }}" crossorigin="anonymous"></script>
-
 {% endblock content %}

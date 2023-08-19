@@ -14,7 +14,6 @@ class Player:
     party_state: Optional[str] = None
 
 
-
 @dataclass
 class Round:
     id: str
