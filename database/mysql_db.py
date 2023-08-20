@@ -40,8 +40,8 @@ def get_connection():
             "name VARCHAR(64), "
             "total_score int DEFAULT 0, "
             "total_rounds int DEFAULT 1, "
-            "party_code VARCHAR(8) NULL, "
-            "party_state VARCHAR(32) NULL)"  # New column
+            "party_code VARCHAR(32) NULL, "
+            "party_state VARCHAR(32) NULL)"
         )
 
         q2 = (
@@ -55,8 +55,7 @@ def get_connection():
             "related_genres VARCHAR(2500), "
             "artist_name VARCHAR(200), "
             "artist_spotify VARCHAR(200), "
-            "artist_preview_url VARCHAR(200), "
-            "party_code VARCHAR(8) NULL)"
+            "artist_preview_url VARCHAR(200))"
         )
 
         q3 = (
@@ -77,16 +76,7 @@ def get_connection():
 
     alter_table = False
     if alter_table:
-        alter_query_players = (
-            "ALTER TABLE players MODIFY COLUMN party_code VARCHAR(32);"
-        )
-        cursor.execute(alter_query_players)
-
-        # Altering for party_games table (assuming you've created it from previous steps)
-        alter_query_party_games = (
-            "ALTER TABLE party_games MODIFY COLUMN party_code VARCHAR(32);"
-        )
-        cursor.execute(alter_query_party_games)
+        cursor.execute("ALTER TABLE rounds DROP COLUMN party_code;")
 
         breakpoint()
 
@@ -115,11 +105,9 @@ def get_connection():
     return connection
 
 
-def insert_player(cursor: Cursor, cookie_id: str, round_type: str):
-    query_insert_player = (
-        """INSERT INTO players (cookie_id, round_type) VALUES (%s, %s)"""
-    )
-    cursor.execute(query_insert_player, [cookie_id, round_type])
+def insert_player(cursor: Cursor, cookie_id: str, round_type: str, party_code: str):
+    query_insert_player = """INSERT INTO players (cookie_id, round_type, party_code) VALUES (%s, %s, %s)"""
+    cursor.execute(query_insert_player, [cookie_id, round_type, party_code])
     return cursor.lastrowid
 
 
@@ -297,7 +285,6 @@ def get_party_by_party_code(cursor: Cursor, party_code: str):
     cursor.execute(query_select_party_game, [party_code])
     result = cursor.fetchone()
 
-    breakpoint()
     if result:
         return PartyGame(*result)
     else:
@@ -310,3 +297,15 @@ def insert_party_player(cursor: Cursor, cookie_id: str, round_type: str):
     )
     cursor.execute(query_insert_player, [cookie_id, round_type])
     return cursor.lastrowid
+
+
+def get_first_player_by_party_code(cursor: Cursor, party_code: str):
+    query_select_player = (
+        """SELECT * FROM players WHERE party_code = %s ORDER BY id ASC LIMIT 1"""
+    )
+    cursor.execute(query_select_player, [party_code])
+    result = cursor.fetchone()
+    if result:
+        return Player(*result)
+    else:
+        return None

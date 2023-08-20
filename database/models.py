@@ -26,7 +26,6 @@ class Round:
     artist_name: str
     artist_spotify: str
     artist_preview_url: str
-    party_code: Optional[str] = None
 
     def get_answer_fields(self):
         return {

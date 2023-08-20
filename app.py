@@ -1,6 +1,7 @@
 import json
 from os import curdir
 from sqlite3 import Cursor
+from tkinter import Place
 from uuid import uuid4
 from flask import (
     Flask,
@@ -13,6 +14,7 @@ from flask import (
 
 from database.mysql_db import (
     get_connection,
+    get_first_player_by_party_code,
     get_party_by_party_code,
     get_player_by_cookie,
     insert_party,
@@ -26,7 +28,7 @@ from database.mysql_db import (
     get_player_by_id,
     get_all_rounds_from_player,
 )
-from game import Game, submit_guess, split_genre
+from game import Game, Player, submit_guess, split_genre
 from datetime import date
 
 from utils.pusher import init_pusher
@@ -41,6 +43,27 @@ pusher = init_pusher()
 ROUND_TYPES = ["5"]
 
 
+def create_new_player(round_type="5", party_code=None):
+    cookie_id = str(uuid4())
+    cursor = db.cursor()
+    player_id = insert_player(cursor, cookie_id, round_type, party_code=party_code)
+    return get_player_by_id(cursor, player_id)
+
+
+def generate_player_rounds(player: Player, round_type="5"):
+    rounds_data = game.generate_all_rounds(int(round_type))
+
+    cursor = db.cursor()
+    for round_ in rounds_data:
+        (artist, genre, related_genres) = round_
+        round_id = insert_round(cursor, player, related_genres, genre, artist)
+        print(round_id)
+
+    db.commit()
+    cursor.close()
+    return
+
+
 @app.route("/")
 def index():
     return render_template("main/index.html", round_types=ROUND_TYPES)
@@ -49,25 +72,13 @@ def index():
 @app.route("/create_game", methods=["POST"])
 def create_game():
     round_type = "5"
-    cookie_id = str(uuid4())
+    player = create_new_player(round_type=round_type)
 
-    cursor = db.cursor()
-    player_id = insert_player(cursor, cookie_id, round_type)
-    player = get_player_by_id(cursor, player_id)
-
-    rounds_data = game.generate_all_rounds(int(round_type))
-
-    for round_ in rounds_data:
-        (artist, genre, related_genres) = round_
-        round_id = insert_round(cursor, player, related_genres, genre, artist)
-        print(round_id)
-
-    db.commit()
-    cursor.close()
+    generate_player_rounds(player)
 
     resp = make_response(redirect(url_for("guess")))
-    resp.set_cookie("cookie_id", value=cookie_id)
-    resp.set_cookie("round_type", value=round_type)
+    resp.set_cookie("cookie_id", value=player.cookie_id)
+    resp.set_cookie("round_type", value="5")
     resp.set_cookie("round_id", expires=0)
     return resp
 
@@ -222,6 +233,10 @@ def create_party():
     cursor = db.cursor()
     insert_party(cursor, party_code)
 
+    player = create_new_player(party_code=party_code)
+
+    generate_player_rounds(player)
+
     return render_template(
         "party/lobby.html", party_code=party_code, user_limit=6, is_host=True
     )
@@ -239,6 +254,25 @@ def join_party():
 
     if not party_game or party_game.game_started:
         return render_template("party/party.html")
+
+    host_player = get_first_player_by_party_code(cursor, party_code)
+    rounds = get_all_rounds_from_player(cursor, player_id=host_player.id)
+
+    player = create_new_player(party_code=party_code)
+
+    for round_ in rounds:
+        artist_dict = {
+            "artist": round_.artist_name,
+            "spotify_link": round_.artist_spotify,
+            "preview_url": round_.artist_preview_url,
+        }
+        round_id = insert_round(
+            cursor, player, round_.related_genres, round_.genre, artist_dict
+        )
+        print(round_id)
+
+    db.commit()
+    cursor.close()
 
     return render_template(
         "party/lobby.html", party_code=party_code, user_limit=6, is_host=False
