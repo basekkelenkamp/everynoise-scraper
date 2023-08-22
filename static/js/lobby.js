@@ -53,6 +53,9 @@ document.addEventListener("DOMContentLoaded", function() {
     
         selfPlayerSlotInput.value = sanitizeInput(playerNameInput.value.trim());
     
+        if (isHost) {
+            selfPlayerSlotInput.value += " (host)"
+        }
         if (warningMessage) {
             warningMessage.style.display = 'none';
         }
@@ -64,6 +67,8 @@ document.addEventListener("DOMContentLoaded", function() {
         button.innerText = 'Not Ready';
         selfPlayerSlotDiv.classList.remove('ready');
         playerNameInput.readOnly = false;
+
+        broadcastClientChange()
     }
 
 
@@ -96,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const pusherKey = document.getElementById('pusher-key').value;
     const isHost = document.getElementById('is-host').value === 'True' ? true : false;
     const partyCode = document.getElementById('party_code').value;
-    const playerId = getCookie("player_id");
+    const playerId = document.getElementById('player-id').value;
 
     console.log("player_id", playerId)
     const pusher = new Pusher(pusherKey, {
@@ -139,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Handle a client change (name or ready status change)
     channel.bind(CLIENTCHANGE_NAME, (data) => {
         console.log(CLIENTCHANGE_NAME)
-        if (data.playerId === playerId) return; // Ignore events triggered by ourselves
+        // if (data.playerId === playerId) return;
 
         updatePlayerSlot(data.playerId, data.playerName, data.status);
     });

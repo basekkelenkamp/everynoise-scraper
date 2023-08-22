@@ -297,6 +297,7 @@ def join_party():
             user_limit=6,
             pusher_key=pusher_key,
             is_host=False,
+            player_id=str(player.id),
         )
     )
 
