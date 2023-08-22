@@ -31,7 +31,7 @@ from database.mysql_db import (
 from game import Game, Player, submit_guess, split_genre
 from datetime import date
 
-from utils.pusher import init_pusher
+from utils.pusher import get_pusher_key, init_pusher
 
 
 app = Flask(__name__)
@@ -237,9 +237,24 @@ def create_party():
 
     generate_player_rounds(player)
 
-    return render_template(
-        "party/lobby.html", party_code=party_code, user_limit=6, is_host=True
+    pusher_key = get_pusher_key()
+
+    resp = make_response(
+        render_template(
+            "party/lobby.html",
+            party_code=party_code,
+            user_limit=6,
+            pusher_key=pusher_key,
+            is_host=True,
+            player_id=str(player.id),
+        )
     )
+
+    resp.set_cookie("cookie_id", value=player.cookie_id)
+    resp.set_cookie("party_code", value=party_code)
+    resp.set_cookie("round_type", value="5")
+    resp.set_cookie("round_id", expires=0)
+    return resp
 
 
 @app.route("/join_party", methods=["POST"])
@@ -274,6 +289,40 @@ def join_party():
     db.commit()
     cursor.close()
 
-    return render_template(
-        "party/lobby.html", party_code=party_code, user_limit=6, is_host=False
+    pusher_key = get_pusher_key()
+
+    resp = make_response(
+        render_template(
+            "party/lobby.html",
+            party_code=party_code,
+            user_limit=6,
+            pusher_key=pusher_key,
+            is_host=False,
+        )
     )
+
+    resp.set_cookie("cookie_id", value=player.cookie_id)
+    resp.set_cookie("party_code", value=party_code)
+    resp.set_cookie("round_type", value="5")
+    resp.set_cookie("round_id", expires=0)
+    resp.set_cookie("player_id", value=str(player.id))
+    return resp
+
+
+@app.route("/pusher/auth", methods=["POST"])
+def pusher_authentication():
+    # party_code = request.cookies.get("party_code")
+    player_id = request.cookies.get("player_id")
+    cookie_id = request.cookies.get("cookie_id")
+
+    channel_name = request.form.get("channel_name")
+    socket_id = request.form.get("socket_id")
+
+    auth = pusher.authenticate(
+        channel=channel_name,
+        socket_id=socket_id,
+        custom_data={
+            "user_id": player_id,
+        },
+    )
+    return json.dumps(auth)

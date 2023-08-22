@@ -2,6 +2,10 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/party.css') }}" crossorigin="anonymous">
 
+<input type="hidden" id="pusher-key" value="{{ pusher_key }}" />
+<input type="hidden" id="is-host" value="{{ is_host }}" />
+<input type="hidden" id="player-id" value="{{ player_id }}" />
+
 <div class="main-wrapper">
 
     <form class="party-form" method="POST" action="{{ url_for('create_party') }}">
@@ -19,17 +23,20 @@
     <div class="party-form">
         <div class="player-slot enter-name">
             <input type="text" class="player-name-input" placeholder="Enter nickname">
+            <span class="warning-message" style="color: red; display: none;">Please enter a nickname!</span>
             <button class="ready-toggle-button">Not Ready</button>
         </div>
     </div>
     
     <div class="player-slots-container party-form">
         {% for i in range(user_limit) %}
-        <div class="player-slot {% if loop.first %}self{% else %}empty{% endif %}">
-            <input type="text" class="player-name" placeholder="player {{ i+1 }}" readonly>
+        <div class="player-slot {% if loop.first %}self{% else %}empty{% endif %}" data-id="{% if loop.first %}{{ player_id }}{% endif %}">
+            <input type="text" class="player-name" placeholder="{% if loop.first %}(you){% else %}player {{ i+1 }}{% endif %}" readonly>
         </div>
         {% endfor %}
     </div>
     
 </div>
+<script src="{{ url_for('static', filename='js/lobby.js') }}" crossorigin="anonymous"></script>
+<script src="https://js.pusher.com/8.3/pusher.min.js" crossorigin="anonymous"></script>
 {% endblock content %}

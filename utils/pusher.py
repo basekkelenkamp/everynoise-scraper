@@ -13,3 +13,9 @@ def init_pusher() -> Pusher:
         cluster="eu",
         ssl=True,
     )
+
+
+def get_pusher_key():
+    load_dotenv()
+
+    return getenv("PUSHER_KEY")

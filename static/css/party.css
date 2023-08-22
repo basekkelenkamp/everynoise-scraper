@@ -59,6 +59,11 @@
     box-shadow: 0 0 5px rgba(0, 128, 0, 0.5);
 }
 
+.ready-toggle-button.active:hover {
+    background-color: darkgreen;
+}
+
+
 @media (max-width: 768px) {
     .party-form {
         width: 75%;
@@ -114,4 +119,8 @@
 .player-name {
     padding: 5px;
     margin: 0;
+}
+
+.player-slot.ready {
+    background-color: rgba(0, 255, 0, 0.2);
 }
