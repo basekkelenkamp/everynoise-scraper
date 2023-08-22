@@ -229,6 +229,11 @@ document.addEventListener("DOMContentLoaded", function() {
     
     function removePlayerFromSlot(playerId_) {
         const playerSlot = document.querySelector(`.player-slot[data-id="${playerId_}"]`);
+        const inputField = playerSlot.querySelector('.player-name');
+
+        if (inputField.value.includes("(host)")) {
+            window.location.href = '/party';
+        }
         
         if (playerSlot) {
             // Revert the slot to an 'empty' state
