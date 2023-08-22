@@ -67,8 +67,6 @@ document.addEventListener("DOMContentLoaded", function() {
         button.innerText = 'Not Ready';
         selfPlayerSlotDiv.classList.remove('ready');
         playerNameInput.readOnly = false;
-
-        broadcastClientChange()
     }
 
 
@@ -85,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             setReadyState(this);
         }
-
+        
         broadcastClientChange()
     });
 
