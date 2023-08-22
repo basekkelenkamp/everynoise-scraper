@@ -141,19 +141,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const UPDATEPLAYERS_NAME = 'client-all-player-slots-update';
     let justJoined = true
 
-
-    // Current player joins the channel, receives a list of all other members. (triggers when joining)
-    // channel.bind('pusher:subscription_succeeded', (members) => {
-        // console.log('pusher:subscription_succeeded')
-        // console.log("player_id:", playerId)
-        // members.each((member) => {
-        //     if (member.id !== playerId) {  // Exclude the current player
-        //         console.log(member)
-        //         addPlayerSlot(member.id)
-        //     }
-        // });
-    // });
-
     // Triggers when a new player joins
     channel.bind('pusher:member_added', (member) => {
         console.log('pusher:member_added')
@@ -172,8 +159,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Handle a client change (name or ready status change)
     channel.bind(CLIENTCHANGE_NAME, (data) => {
         console.log(CLIENTCHANGE_NAME)
-        // if (data.playerId === playerId) return;
-
         updatePlayerSlot(data.playerId, data.playerName, data.status);
     });
 
@@ -193,9 +178,13 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     function broadcastClientChange() {
-        const playerName = sanitizeInput(playerNameInput.value.trim());
+        let playerName = sanitizeInput(playerNameInput.value.trim());
         const status = selfPlayerSlotDiv.classList.contains('ready') ? 'ready' : 'unready';
         
+        if (isHost && !playerName.endsWith(" (host)")) {
+            playerName += " (host)";
+        }
+
         channel.trigger(CLIENTCHANGE_NAME, {
             playerId: playerId,
             playerName: playerName,
@@ -205,12 +194,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function broadcastAllPlayersInfo() {
         const allPlayerSlots = Array.from(playerSlotsContainer.querySelectorAll('.player-slot:not(.empty)'));
-        const data = allPlayerSlots.map(slot => ({
-            id: slot.getAttribute('data-id'),
-            name: slot.querySelector('.player-name').value,
-            status: slot.classList.contains('ready') ? 'ready' : 'unready'
-        }));
-
+        const data = allPlayerSlots.map(slot => {
+            let playerName = slot.querySelector('.player-name').value;
+            if (isHost && slot.getAttribute('data-id') === playerId && !playerName.endsWith(" (host)")) {
+                playerName += " (host)";
+            }
+            return {
+                id: slot.getAttribute('data-id'),
+                name: playerName,
+                status: slot.classList.contains('ready') ? 'ready' : 'unready'
+            };
+        });
+    
         // Broadcast this full state to all players
         channel.trigger(UPDATEPLAYERS_NAME, data);
     }
@@ -250,11 +245,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     function updatePlayerSlot(playerId_, playerName, status) {
-        if (playerId_ === playerId) return;
-        console.log("updating player slot:");
-        console.log(playerId_, playerName, status);
-    
-        // Find the player slot with the corresponding data-id
+        if (playerId_ === playerId) return;    
         const playerSlot = document.querySelector(`.player-slot[data-id="${playerId_}"]`);
     
         if (!playerSlot) {
@@ -266,6 +257,11 @@ document.addEventListener("DOMContentLoaded", function() {
         const inputField = playerSlot.querySelector('.player-name');
         inputField.value = playerName;
     
+        if (isHost && playerId_ === playerId && !playerName.endsWith(" (host)")) {
+            playerName += " (host)";
+        }
+        inputField.value = playerName;
+
         if (status === 'ready') {
             playerSlot.classList.add('ready');
         } else {
