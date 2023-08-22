@@ -1,7 +1,6 @@
 import json
 from os import curdir
 from sqlite3 import Cursor
-from tkinter import Place
 from uuid import uuid4
 from flask import (
     Flask,
