@@ -127,6 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Triggers when a new player joins
     channel.bind('pusher:member_added', (member) => {
+        console.log('pusher:member_added')
         addPlayerSlot(member.id)
         if (isHost) {
             broadcastAllPlayersInfo()
