@@ -221,8 +221,13 @@ def match_details(player_id):
 
 @app.route("/party")
 def party():
-    party_code = str(uuid4()).replace("-", "")[0:16]
-    return render_template("party/party.html", party_code=party_code)
+    resp = make_response(render_template("party/party.html"))
+    resp.set_cookie("cookie_id", expires=0)
+    resp.set_cookie("party_code", expires=0)
+    resp.set_cookie("round_type", expires=0)
+    resp.set_cookie("round_id", expires=0)
+    resp.set_cookie("player_id", expires=0)
+    return resp
 
 
 @app.route("/create_party", methods=["POST"])
@@ -252,7 +257,7 @@ def create_party():
     resp.set_cookie("cookie_id", value=player.cookie_id)
     resp.set_cookie("party_code", value=party_code)
     resp.set_cookie("round_type", value="5")
-    resp.set_cookie("round_id", expires=0)
+    resp.set_cookie("player_id", value=str(player.id))
     return resp
 
 
@@ -311,9 +316,7 @@ def join_party():
 
 @app.route("/pusher/auth", methods=["POST"])
 def pusher_authentication():
-    # party_code = request.cookies.get("party_code")
     player_id = request.cookies.get("player_id")
-    cookie_id = request.cookies.get("cookie_id")
 
     channel_name = request.form.get("channel_name")
     socket_id = request.form.get("socket_id")
@@ -326,3 +329,8 @@ def pusher_authentication():
         },
     )
     return json.dumps(auth)
+
+
+@app.route("/party_guess", methods=["GET", "POST"])
+def party_guess():
+    return "swag"

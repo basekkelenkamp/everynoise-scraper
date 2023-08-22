@@ -124,3 +124,11 @@
 .player-slot.ready {
     background-color: rgba(0, 255, 0, 0.2);
 }
+
+#submit_button[disabled]:hover {
+    cursor: not-allowed;
+}
+
+#submit_button[disabled="false"]:hover {
+    cursor: pointer;
+}

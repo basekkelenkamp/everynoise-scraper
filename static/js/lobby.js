@@ -3,12 +3,6 @@ function sanitizeInput(input) {
     return input.replace(/[^a-zA-Z0-9 !&*@?._\\|\/]/g, "");
 }
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
 function sortPlayerSlots() {
     const container = document.querySelector('.player-slots-container');
 
@@ -43,7 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const warningMessage = document.querySelector('.warning-message');
     const selfPlayerSlotDiv = document.querySelector('.player-slot.self');
     const selfPlayerSlotInput = selfPlayerSlotDiv.querySelector('.player-name');
-    
+    const submitButton = document.getElementById('submit_button');
+
 
     function setReadyState(button) {
         button.classList.add('active');
@@ -68,6 +63,40 @@ document.addEventListener("DOMContentLoaded", function() {
         selfPlayerSlotDiv.classList.remove('ready');
         playerNameInput.readOnly = false;
     }
+
+    if (submitButton) {
+        submitButton.addEventListener('mouseover', function() {
+    
+            const allPlayerSlots = Array.from(playerSlotsContainer.querySelectorAll('.player-slot:not(.empty)'));
+    
+            if (allPlayerSlots.length > 1 && allPlayerSlots.length < 7) {
+                // Check if all players are ready
+                console.log(allPlayerSlots)
+                const allPlayersReady = allPlayerSlots.every(slot => slot.classList.contains('ready'));
+            
+                console.log(allPlayersReady)
+                if (allPlayersReady) {
+                    console.log("all players ready")
+                    this.disabled = false;
+                } else {
+                    this.disabled = true;
+                }
+            } else {
+                this.disabled = true;
+            }
+            
+            if (this.disabled) {
+                this.dataset.originalText = this.textContent;
+                this.textContent = 'WAIT ON READY';
+            }
+        });
+
+        submitButton.addEventListener('mouseout', function() {
+            this.textContent = "START GAME";
+        });
+    }
+
+
 
 
     readyToggleButton.addEventListener('click', function() {

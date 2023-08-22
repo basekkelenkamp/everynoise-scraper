@@ -8,12 +8,12 @@
 
 <div class="main-wrapper">
 
-    <form class="party-form" method="POST" action="{{ url_for('create_party') }}">
+    <form class="party-form" method="POST" action="{{ url_for('party_guess') }}">
         <p>Send this party code to your friends!</p>
         <input type="text" id="party_code" name="party_code" value="{{ party_code }}" readonly>
         <div class="menu-item-wrapper create-party-button">
             {% if is_host %}
-                <button type="submit" id="submit_button" name="submit_button">START GAME</button>
+                <button type="submit" id="submit_button" name="submit_button" disabled>START GAME</button>
             {% else %}
                 <button type="button" id="waiting_button" disabled>waiting for host</button>
             {% endif %}
