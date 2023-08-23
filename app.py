@@ -1,8 +1,5 @@
-from bdb import Breakpoint
+from curses import meta
 import json
-from os import curdir
-from sqlite3 import Cursor
-from time import sleep
 from uuid import uuid4
 from flask import (
     Flask,
@@ -39,7 +36,7 @@ from utils.pusher import get_pusher_key, init_pusher
 
 app = Flask(__name__)
 
-db = get_connection()
+# db = get_connection()
 game = Game()
 pusher = init_pusher()
 
@@ -48,7 +45,10 @@ ROUND_TYPES = ["5"]
 
 def create_new_player(round_type="5", party_code=None):
     cookie_id = str(uuid4())
+
+    db = get_connection()
     cursor = db.cursor()
+
     player_id = insert_player(cursor, cookie_id, round_type, party_code=party_code)
     return get_player_by_id(cursor, player_id)
 
@@ -56,7 +56,10 @@ def create_new_player(round_type="5", party_code=None):
 def generate_player_rounds(player: Player, round_type="5"):
     rounds_data = game.generate_all_rounds(int(round_type))
 
+    db = get_connection()
     cursor = db.cursor()
+    # cursor.connection.ping(reconnect=True)
+
     for round_ in rounds_data:
         (artist, genre, related_genres) = round_
         round_id = insert_round(cursor, player, related_genres, genre, artist)
@@ -91,12 +94,13 @@ def create_game():
 def guess():
     cookie_id = request.cookies.get("cookie_id")
     round_type = request.cookies.get("round_type")
-    party_code = request.cookies.get("party_code")
 
     if not cookie_id or request.cookies.get("round_id"):
         return redirect(url_for("index"))
 
+    db = get_connection()
     cursor = db.cursor()
+
     player = get_player_by_cookie(cursor, cookie_id)
 
     if not player:
@@ -106,29 +110,16 @@ def guess():
 
     total_words = len(split_genre(valid_rounds[0].genre))
 
-    if party_code:
-        resp = make_response(
-            render_template(
-                "party/party_guess.html",
-                round_number=player.total_rounds,
-                round_type=player.round_type,
-                points_total=player.total_score,
-                artist_url=valid_rounds[0].artist_preview_url,
-                total_words=total_words,
-            )
+    resp = make_response(
+        render_template(
+            "main/guess.html",
+            round_number=player.total_rounds,
+            round_type=player.round_type,
+            points_total=player.total_score,
+            artist_url=valid_rounds[0].artist_preview_url,
+            total_words=total_words,
         )
-    else:
-        resp = make_response(
-            render_template(
-                "main/guess.html",
-                round_number=player.total_rounds,
-                round_type=player.round_type,
-                points_total=player.total_score,
-                artist_url=valid_rounds[0].artist_preview_url,
-                total_words=total_words,
-            )
-        )
-
+    )
     resp.set_cookie("round_id", value=str(valid_rounds[0].id))
     return resp
 
@@ -137,11 +128,14 @@ def guess():
 def answer():
     round_id = request.cookies.get("round_id")
     cookie_id = request.cookies.get("cookie_id")
+    party_code = request.cookies.get("party_code")
 
     if not round_id or not cookie_id:
         return redirect(url_for("index"))
 
+    db = get_connection()
     cursor = db.cursor()
+
     round_ = get_round_by_id(cursor, int(round_id))
 
     if round_.guess:
@@ -153,7 +147,6 @@ def answer():
     if not round_.guess:
         round_.guess = "skipped"
 
-    cursor = db.cursor()
     player = get_player_by_cookie(cursor, cookie_id)
 
     answer_dict = round_.get_answer_fields()
@@ -163,14 +156,36 @@ def answer():
     update_round(cursor, round_)
     update_player(cursor, player, round_.points)
 
-    db.commit()
-
     end = 0 == len(get_all_rounds_from_player(cursor, player.id, empty_guess_only=True))
-    cursor.close()
 
-    # unpacking: rounds, points, guess, genre, artist, spotify_link, message
-    resp = make_response(render_template("main/answer.html", **answer_dict, end=end))
-    resp.set_cookie("round_id", expires=0)
+    if party_code:
+        is_host = True if request.cookies.get("is_host") else False
+
+        total_players = None
+        party = get_party_by_party_code(cursor, party_code)
+        total_players = party.total_players
+
+        resp = make_response(
+            render_template(
+                "party/party_wait.html",
+                guess=answer_dict["guess"],
+                player_id=str(player.id),
+                total_players=total_players,
+                is_host=is_host,
+                pusher_key=get_pusher_key(),
+                party_code=party_code,
+                round_id=round_id,
+            )
+        )
+    else:
+        # unpacking: rounds, points, guess, genre, artist, spotify_link, message
+        resp = make_response(
+            render_template("main/answer.html", **answer_dict, end=end)
+        )
+        resp.set_cookie("round_id", expires=0)
+
+    db.commit()
+    db.close()
     return resp
 
 
@@ -181,9 +196,12 @@ def submit_score():
     if not name or not cookie_id or not request.form.get("submit_score"):
         redirect(url_for("index"))
 
+    db = get_connection()
     cursor = db.cursor()
+
     player = get_player_by_cookie(cursor, cookie_id)
     update_player_name(cursor, player.id, name)
+
     db.commit()
     cursor.close()
 
@@ -197,7 +215,9 @@ def submit_score():
 def leaderboards(round_type=5, id_=None):
     print(id_, round_type)
 
+    db = get_connection()
     cursor = db.cursor()
+
     main_high_scores = get_all_round_type_highscores(cursor, ROUND_TYPES)[0]["data"]
 
     return render_template(
@@ -210,7 +230,11 @@ def leaderboards(round_type=5, id_=None):
 
 @app.route("/match_details/<player_id>")
 def match_details(player_id):
+
+    db = get_connection()
     cursor = db.cursor()
+    cursor.connection.ping(reconnect=True)
+
     player = get_player_by_id(cursor, int(player_id))
 
     # guess, genre, points, artist_name, artist_spotify
@@ -246,6 +270,7 @@ def party():
     resp.set_cookie("round_type", expires=0)
     resp.set_cookie("round_id", expires=0)
     resp.set_cookie("player_id", expires=0)
+    resp.set_cookie("is_host", expires=0)
     return resp
 
 
@@ -253,10 +278,15 @@ def party():
 def create_party():
     party_code = str(uuid4()).replace("-", "")[0:16]
 
+    db = get_connection()
     cursor = db.cursor()
+
     insert_party(cursor, party_code)
 
     player = create_new_player(party_code=party_code)
+
+    db.commit()
+    db.close()
 
     generate_player_rounds(player)
 
@@ -289,7 +319,9 @@ def join_party():
     if not party_code:
         return render_template("party/party.html")
 
+    db = get_connection()
     cursor = db.cursor()
+
     party_game = get_party_by_party_code(cursor, party_code)
 
     if not party_game or party_game.game_started:
@@ -312,7 +344,7 @@ def join_party():
         print(round_id)
 
     db.commit()
-    cursor.close()
+    db.close()
 
     pusher_key = get_pusher_key()
 
@@ -355,33 +387,65 @@ def pusher_authentication():
 
 @app.route("/initialize_party", methods=["POST"])
 def initialize_party():
-    print("party initialize..")
     data = request.json
     party_code = request.cookies.get("party_code")
     is_host = True if request.cookies.get("is_host") else False
 
     # Only triggered when the game starts
     if is_host:
+        db = get_connection()
         cursor = db.cursor()
+
         players = data.get("playerData")
         update_party(
             cursor, party_code=party_code, game_started=True, total_players=len(players)
         )
 
-        sleep(0.1)
         for player_id, player_name in players.items():
-            print(player_id)
-            print(player_name)
             update_player_name(cursor, player_id, player_name)
 
         db.commit()
-        cursor.close()
+        db.close()
 
     return jsonify({"redirect_url": "guess"})
 
 
-@app.route("/party_wait", methods=["GET", "POST"])
-def party_wait():
-    guess = request.form.get("genre_guess")
+@app.route("/get_round_party_data", methods=["POST"])
+def get_round_party_data():
+    data = request.json
+    round_id = data.get("roundId")
+    party_code = request.cookies.get("party_code")
 
-    return "wait"
+    breakpoint()
+    db = get_connection()
+    cursor = db.cursor()
+
+    # get_all_players_by_party_code
+    # loop through each players' rounds and receive the last updated round column.
+
+    db.commit()
+    db.close()
+
+    # example how the data should look
+    data = {
+        "players": [
+            {
+                "player1": {
+                    "round_guess": "guess",
+                    "total_points": 1234,
+                    "round_points": 123,
+                    "position": "1",
+                }
+            }
+        ],
+        "answer": "correct genre",
+    }
+
+    return jsonify(data)
+
+
+@app.route("/party_round_answer", methods=["POST"])
+def party_round_answer():
+
+    # extract all round data from form
+    return render_template("party/party_answer.html")

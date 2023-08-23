@@ -1,0 +1,23 @@
+{% extends "layout.html" %} {% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/party_wait.css') }}" crossorigin="anonymous">
+
+<input type="hidden" id="player-id" value="{{ player_id }}" />
+<input type="hidden" id="round-id" value="{{ round_id }}" />
+<input type="hidden" id="guess" value="{{ guess }}" />
+<input type="hidden" id="is-host" value="{{ is_host }}" />
+<input type="hidden" id="total-players" value="{{ total_players }}" />
+<input type="hidden" id="party-code" value="{{ party_code }}" />
+<input type="hidden" id="pusher-key" value="{{ pusher_key }}" />
+
+<div class="main-wrapper">
+    <div class="answer-info-wrapper">
+        <p>You guessed: {{ guess }}</p>
+    </div>
+    <div class="answer-info-wrapper">
+        <p class="waiting-players">Waiting for {{ total_players - 1 }} player(s)</p>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/party_wait.js') }}" crossorigin="anonymous"></script>
+<script src="https://js.pusher.com/8.3/pusher.min.js" crossorigin="anonymous"></script>
+{% endblock content %}
