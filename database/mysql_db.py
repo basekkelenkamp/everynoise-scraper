@@ -195,7 +195,7 @@ def update_player(cursor: Cursor, player: Player, new_points: int):
     )
 
 
-def update_player_name(cursor: Cursor, player: Player, name: str):
+def update_player_name(cursor: Cursor, player_id: str, name: str):
     query_update_player = """
         UPDATE players SET 
         name = %s
@@ -206,7 +206,7 @@ def update_player_name(cursor: Cursor, player: Player, name: str):
         query_update_player,
         [
             name,
-            player.id,
+            player_id,
         ],
     )
 
@@ -309,3 +309,35 @@ def get_first_player_by_party_code(cursor: Cursor, party_code: str):
         return Player(*result)
     else:
         return None
+
+
+def update_party(
+    cursor: Cursor,
+    party_code: str,
+    game_started=None,
+    finished_rounds=None,
+    total_players=None,
+):
+    query_params = []
+    update_clauses = []
+
+    if game_started is not None:
+        update_clauses.append("game_started = %s")
+        query_params.append(game_started)
+
+    if finished_rounds is not None:
+        update_clauses.append("finished_rounds = %s")
+        query_params.append(finished_rounds)
+
+    if total_players is not None:
+        update_clauses.append("total_players = %s")
+        query_params.append(total_players)
+
+    query_update_party = f"""
+        UPDATE party_games
+        SET {', '.join(update_clauses)}
+        WHERE party_code = %s
+    """
+    query_params.append(party_code)
+
+    cursor.execute(query_update_party, query_params)

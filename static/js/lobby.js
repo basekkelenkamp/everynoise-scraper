@@ -30,6 +30,20 @@ function sortPlayerSlots() {
     slots.forEach(slot => container.appendChild(slot));
 }
 
+function getPlayerData() {
+    const allPlayerSlots = Array.from(document.querySelector('.player-slots-container').querySelectorAll('.player-slot:not(.empty)'));
+    
+    let playersData = {};
+
+    allPlayerSlots.forEach(slot => {
+        const playerId = slot.getAttribute('data-id');
+        const playerName = slot.querySelector('.player-name').value;
+        playersData[playerId] = playerName;
+    });
+
+    return playersData;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const readyToggleButton = document.querySelector('.ready-toggle-button');
     const playerNameInput = document.querySelector('.player-name-input');
@@ -38,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const selfPlayerSlotDiv = document.querySelector('.player-slot.self');
     const selfPlayerSlotInput = selfPlayerSlotDiv.querySelector('.player-name');
     const submitButton = document.getElementById('submit_button');
+    const partyForm = document.querySelector('.party-form');
 
 
     function setReadyState(button) {
@@ -70,11 +85,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const allPlayerSlots = Array.from(playerSlotsContainer.querySelectorAll('.player-slot:not(.empty)'));
     
             if (allPlayerSlots.length > 1 && allPlayerSlots.length < 7) {
-                // Check if all players are ready
-                console.log(allPlayerSlots)
                 const allPlayersReady = allPlayerSlots.every(slot => slot.classList.contains('ready'));
             
-                console.log(allPlayersReady)
                 if (allPlayersReady) {
                     console.log("all players ready")
                     this.disabled = false;
@@ -96,8 +108,14 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-
-
+    partyForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const playerData = getPlayerData()
+        if (isHost) {
+            channel.trigger('client-start-game', {message: 'start'});
+            startGame(playerData)
+        }
+    });
 
     readyToggleButton.addEventListener('click', function() {
         if (playerNameInput.value.trim() === '') {
@@ -176,6 +194,44 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
     });
+
+    // Starts game
+    channel.bind('client-start-game', (data) => {
+        console.log('client-start-game')
+        startGame();
+    });
+
+    function startGame(playerData = null) {
+        console.log("Game is starting!");
+
+        fetch('/initialize_party', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                playerData: playerData
+             })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })        
+        .then(data => {
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+        })
+        .catch(error => {
+            console.error("Error starting the game:", error.message);
+            console.log("Full error:", error);
+            });
+    
+    }
+
+
     
     function broadcastClientChange() {
         let playerName = sanitizeInput(playerNameInput.value.trim());

@@ -1,6 +1,8 @@
+from bdb import Breakpoint
 import json
 from os import curdir
 from sqlite3 import Cursor
+from time import sleep
 from uuid import uuid4
 from flask import (
     Flask,
@@ -9,6 +11,7 @@ from flask import (
     make_response,
     redirect,
     url_for,
+    jsonify,
 )
 
 from database.mysql_db import (
@@ -19,6 +22,7 @@ from database.mysql_db import (
     insert_party,
     insert_round,
     get_round_by_id,
+    update_party,
     update_round,
     update_player,
     update_player_name,
@@ -79,6 +83,7 @@ def create_game():
     resp.set_cookie("cookie_id", value=player.cookie_id)
     resp.set_cookie("round_type", value="5")
     resp.set_cookie("round_id", expires=0)
+    resp.set_cookie("party_code", expires=0)
     return resp
 
 
@@ -86,6 +91,7 @@ def create_game():
 def guess():
     cookie_id = request.cookies.get("cookie_id")
     round_type = request.cookies.get("round_type")
+    party_code = request.cookies.get("party_code")
 
     if not cookie_id or request.cookies.get("round_id"):
         return redirect(url_for("index"))
@@ -100,16 +106,29 @@ def guess():
 
     total_words = len(split_genre(valid_rounds[0].genre))
 
-    resp = make_response(
-        render_template(
-            "main/guess.html",
-            round_number=player.total_rounds,
-            round_type=player.round_type,
-            points_total=player.total_score,
-            artist_url=valid_rounds[0].artist_preview_url,
-            total_words=total_words,
+    if party_code:
+        resp = make_response(
+            render_template(
+                "party/party_guess.html",
+                round_number=player.total_rounds,
+                round_type=player.round_type,
+                points_total=player.total_score,
+                artist_url=valid_rounds[0].artist_preview_url,
+                total_words=total_words,
+            )
         )
-    )
+    else:
+        resp = make_response(
+            render_template(
+                "main/guess.html",
+                round_number=player.total_rounds,
+                round_type=player.round_type,
+                points_total=player.total_score,
+                artist_url=valid_rounds[0].artist_preview_url,
+                total_words=total_words,
+            )
+        )
+
     resp.set_cookie("round_id", value=str(valid_rounds[0].id))
     return resp
 
@@ -164,7 +183,7 @@ def submit_score():
 
     cursor = db.cursor()
     player = get_player_by_cookie(cursor, cookie_id)
-    update_player_name(cursor, player, name)
+    update_player_name(cursor, player.id, name)
     db.commit()
     cursor.close()
 
@@ -257,6 +276,8 @@ def create_party():
     resp.set_cookie("cookie_id", value=player.cookie_id)
     resp.set_cookie("party_code", value=party_code)
     resp.set_cookie("round_type", value="5")
+    resp.set_cookie("round_id", expires=0)
+    resp.set_cookie("is_host", value="true")
     resp.set_cookie("player_id", value=str(player.id))
     return resp
 
@@ -310,6 +331,7 @@ def join_party():
     resp.set_cookie("party_code", value=party_code)
     resp.set_cookie("round_type", value="5")
     resp.set_cookie("round_id", expires=0)
+    resp.set_cookie("is_host", expires=0)
     resp.set_cookie("player_id", value=str(player.id))
     return resp
 
@@ -331,6 +353,35 @@ def pusher_authentication():
     return json.dumps(auth)
 
 
-@app.route("/party_guess", methods=["GET", "POST"])
-def party_guess():
-    return "swag"
+@app.route("/initialize_party", methods=["POST"])
+def initialize_party():
+    print("party initialize..")
+    data = request.json
+    party_code = request.cookies.get("party_code")
+    is_host = True if request.cookies.get("is_host") else False
+
+    # Only triggered when the game starts
+    if is_host:
+        cursor = db.cursor()
+        players = data.get("playerData")
+        update_party(
+            cursor, party_code=party_code, game_started=True, total_players=len(players)
+        )
+
+        sleep(0.1)
+        for player_id, player_name in players.items():
+            print(player_id)
+            print(player_name)
+            update_player_name(cursor, player_id, player_name)
+
+        db.commit()
+        cursor.close()
+
+    return jsonify({"redirect_url": "guess"})
+
+
+@app.route("/party_wait", methods=["GET", "POST"])
+def party_wait():
+    guess = request.form.get("genre_guess")
+
+    return "wait"
