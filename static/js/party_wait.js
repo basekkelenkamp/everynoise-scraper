@@ -76,7 +76,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 data: data
             });
 
-            redirectWithPost('party_round_answer', data)
+            setTimeout(function() {
+                redirectWithPost('party_round_answer', data);
+            }, 500);
+
         })
         .catch(error => {
             console.error("Error fetching round data:", error.message);
