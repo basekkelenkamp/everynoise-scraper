@@ -198,7 +198,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // Starts game
     channel.bind('client-start-game', (data) => {
         console.log('client-start-game')
-        startGame();
+
+        setTimeout(function() {
+            startGame();
+        }, 500);
     });
 
     function startGame(playerData = null) {
@@ -220,8 +223,15 @@ document.addEventListener("DOMContentLoaded", function() {
             return response.json();
         })        
         .then(data => {
+            let delay = 10
+
+            if (isHost) {
+                delay = 1000
+            }
             if (data.redirect_url) {
-                window.location.href = data.redirect_url;
+                setTimeout(function() {
+                    redirectWithPost(data.redirect_url);
+                }, delay);    
             }
         })
         .catch(error => {
@@ -231,7 +241,17 @@ document.addEventListener("DOMContentLoaded", function() {
     
     }
 
-
+    function redirectWithPost(url) {
+        console.log("redirect with post");
+    
+        // Create a form dynamically
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = url;
+    
+        document.body.appendChild(form);
+        form.submit();
+    }
     
     function broadcastClientChange() {
         let playerName = sanitizeInput(playerNameInput.value.trim());
