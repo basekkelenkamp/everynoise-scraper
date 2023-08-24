@@ -50,15 +50,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     channel.bind('client-end-round', (data) => {
         console.log('client-end-round')
-        console.log(data)
-
-        redirectWithPost('party_round_answer', data)
+        redirectWithPost('party_round_answer', data.data)
     });
 
 
     function roundReadyState() {
-        let playersRoundData = null
-
         fetch('/get_round_party_data', {
             method: 'POST',
             headers: {
@@ -76,42 +72,51 @@ document.addEventListener("DOMContentLoaded", function() {
             return response.json();
         })        
         .then(data => {
-            console.log(data)
-            playersRoundData = data
+            channel.trigger('client-end-round', {
+                data: data
+            });
+
+            redirectWithPost('party_round_answer', data)
         })
         .catch(error => {
             console.error("Error fetching round data:", error.message);
             console.log("Full error:", error);
             });
-
-
-        channel.trigger('client-end-round', {
-            data: playersRoundData
-        });
-
     }
 
     function redirectWithPost(url, data) {
-        console.log("redirect with post")
-
+        console.log("redirect with post");
+        console.log(data);
+    
         // Create a form dynamically
         const form = document.createElement('form');
         form.method = 'post';
         form.action = url;
     
-        // Add the data to the form
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = data[key];
-                form.appendChild(input);
+        // Add the 'answer' data
+        const answerInput = document.createElement('input');
+        answerInput.type = 'hidden';
+        answerInput.name = 'answer';
+        answerInput.value = data.answer;
+        form.appendChild(answerInput);
+    
+        // Add the player data as hidden inputs with IDs based on player names
+        for (const player of data.players) {
+            const playerName = player.player_name;  // Extract player's name
+            const playerData = player;
+    
+            for (const key in playerData) {
+                if (playerData.hasOwnProperty(key)) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = `${playerName}.${key}`;
+                    input.value = playerData[key];
+                    form.appendChild(input);
+                }
             }
         }
     
-        // Append the form to the body and submit it
         document.body.appendChild(form);
-        // form.submit();
+        form.submit();
     }
 });

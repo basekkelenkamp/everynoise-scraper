@@ -1,4 +1,3 @@
-from curses import meta
 import json
 from uuid import uuid4
 from flask import (
@@ -14,8 +13,10 @@ from flask import (
 from database.mysql_db import (
     get_connection,
     get_first_player_by_party_code,
+    get_last_updated_round_from_party_players,
     get_party_by_party_code,
     get_player_by_cookie,
+    increment_party_rounds_by_one,
     insert_party,
     insert_round,
     get_round_by_id,
@@ -29,14 +30,12 @@ from database.mysql_db import (
     get_all_rounds_from_player,
 )
 from game import Game, Player, submit_guess, split_genre
-from datetime import date
-
 from utils.pusher import get_pusher_key, init_pusher
 
 
 app = Flask(__name__)
 
-# db = get_connection()
+# db = get_connection(refresh=False)
 game = Game()
 pusher = init_pusher()
 
@@ -46,7 +45,7 @@ ROUND_TYPES = ["5"]
 def create_new_player(round_type="5", party_code=None):
     cookie_id = str(uuid4())
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     player_id = insert_player(cursor, cookie_id, round_type, party_code=party_code)
@@ -56,7 +55,7 @@ def create_new_player(round_type="5", party_code=None):
 def generate_player_rounds(player: Player, round_type="5"):
     rounds_data = game.generate_all_rounds(int(round_type))
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
     # cursor.connection.ping(reconnect=True)
 
@@ -98,7 +97,7 @@ def guess():
     if not cookie_id or request.cookies.get("round_id"):
         return redirect(url_for("index"))
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     player = get_player_by_cookie(cursor, cookie_id)
@@ -133,7 +132,7 @@ def answer():
     if not round_id or not cookie_id:
         return redirect(url_for("index"))
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     round_ = get_round_by_id(cursor, int(round_id))
@@ -196,7 +195,7 @@ def submit_score():
     if not name or not cookie_id or not request.form.get("submit_score"):
         redirect(url_for("index"))
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     player = get_player_by_cookie(cursor, cookie_id)
@@ -215,7 +214,7 @@ def submit_score():
 def leaderboards(round_type=5, id_=None):
     print(id_, round_type)
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     main_high_scores = get_all_round_type_highscores(cursor, ROUND_TYPES)[0]["data"]
@@ -231,7 +230,7 @@ def leaderboards(round_type=5, id_=None):
 @app.route("/match_details/<player_id>")
 def match_details(player_id):
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
     cursor.connection.ping(reconnect=True)
 
@@ -278,7 +277,7 @@ def party():
 def create_party():
     party_code = str(uuid4()).replace("-", "")[0:16]
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     insert_party(cursor, party_code)
@@ -319,7 +318,7 @@ def join_party():
     if not party_code:
         return render_template("party/party.html")
 
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
     party_game = get_party_by_party_code(cursor, party_code)
@@ -393,7 +392,7 @@ def initialize_party():
 
     # Only triggered when the game starts
     if is_host:
-        db = get_connection()
+        db = get_connection(refresh=True)
         cursor = db.cursor()
 
         players = data.get("playerData")
@@ -416,36 +415,74 @@ def get_round_party_data():
     round_id = data.get("roundId")
     party_code = request.cookies.get("party_code")
 
-    breakpoint()
-    db = get_connection()
+    db = get_connection(refresh=True)
     cursor = db.cursor()
 
-    # get_all_players_by_party_code
-    # loop through each players' rounds and receive the last updated round column.
+    final_data = get_last_updated_round_from_party_players(
+        cursor, party_code, int(round_id)
+    )
+    increment_party_rounds_by_one(cursor, party_code)
 
     db.commit()
     db.close()
 
-    # example how the data should look
-    data = {
-        "players": [
-            {
-                "player1": {
-                    "round_guess": "guess",
-                    "total_points": 1234,
-                    "round_points": 123,
-                    "position": "1",
-                }
-            }
-        ],
-        "answer": "correct genre",
-    }
-
-    return jsonify(data)
+    return jsonify(final_data)
 
 
 @app.route("/party_round_answer", methods=["POST"])
 def party_round_answer():
+    data = request.form
+    answer = data.get("answer")
+    party_code = request.cookies.get("party_code")
 
-    # extract all round data from form
-    return render_template("party/party_answer.html")
+    players_data = []
+    current_player = {}
+
+    for k, value in data.items():
+        if k == "answer":
+            continue
+
+        player_name, key = k.split(".")
+        if player_name != current_player.get("player_name"):
+            if current_player:  # Append the current player's data
+                players_data.append(current_player)
+            current_player = {"player_name": player_name}
+        current_player[key] = value
+
+    # Append the last player's data
+    if current_player:
+        players_data.append(current_player)
+
+    # example_data = [
+    #     {'player_name': 'he (host)', 'round_guess': 'skipped', 'round_points': '0', 'total_points': '0'},
+    #     {'player_name': 'asb', 'round_guess': 'asjajh', 'round_points': '200', 'total_points': '200'}
+    # ]
+
+    db = get_connection(refresh=True)
+    cursor = db.cursor()
+
+    party = get_party_by_party_code(cursor, party_code)
+
+    end = False
+    if party.finished_rounds >= 5:
+        end = True
+        # remove_all_party_data(cursor, party_code)
+        # db.commit()
+
+    db.close()
+
+    sorted_players_data = sorted(
+        players_data, key=lambda x: int(x["total_points"]), reverse=True
+    )
+
+    resp = make_response(
+        render_template(
+            "party/party_answer.html",
+            players_data=sorted_players_data,
+            answer=answer,
+            end=end,
+        )
+    )
+
+    resp.set_cookie("round_id", expires=0)
+    return resp

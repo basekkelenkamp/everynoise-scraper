@@ -1,9 +1,36 @@
 {% extends "layout.html" %} {% block content %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/answer.css') }}" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/party_answer.css') }}" crossorigin="anonymous">
+
+{% if end %}
+<input type="hidden" id="end" value="end" />
+{% endif %}
 
 <div class="main-wrapper">
-    swag
+    
+    <h2>Answer: {{ answer }}</h2>
+    
+    <div class="scores">
+        <ul>
+            {% for player in players_data %}    
+            <li>
+                <p class="player-guess">
+                    <span class="bigger">#{{ loop.index }}</span> {{ player.player_name }} --> {{ player.round_guess }}
+                </p>
+                <p class="points">
+                    Round: +{{ player.round_points }} | Total points: <span class="bigger">{{ player.total_points }}</span>
+                </p>
+                {% endfor %}
+        </ul>
+    </div>
+
+    {% if end %}
+        <form method="GET" action="{{ url_for('party') }}">
+            <button type="submit" id="submit_button" name="submit_button">play again?</button>
+        </form>
+    {% endif %}
+
+
 </div>
 
-
+<script src="{{ url_for('static', filename='js/party_answer.js') }}" crossorigin="anonymous"></script>
 {% endblock content %}

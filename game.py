@@ -36,52 +36,53 @@ def _calculate_points(guess: str, answer: str, related: list):
     split_guess = split_genre(guess)
     split_answer = split_genre(answer)
 
-    if any(
-        [
-            answer == guess,
-            split_answer == split_guess,
-            "".join(split_guess) == "".join(split_answer),
-        ]
-    ):
-        song_points = 750
-        message = "INSANE! You guessed the exact genre!"
-        return song_points, message
-
-    correct_parts_count = sum(guess_part in split_answer for guess_part in split_guess)
-    if correct_parts_count:
-        part_percentage = correct_parts_count / len(split_answer)
-        song_points = int(500 * part_percentage)
-        message = f"NICE! You guessed {correct_parts_count} part(s) and {int(part_percentage * 100)}% of the genre correctly!"
-
-        if len(split_guess) - len(split_answer) > 0:
-            extra = len(split_guess) - len(split_answer)
-            song_points -= int(((500 / len(split_answer)) * extra) / 2)
-            message = message + f" {extra} extra word(s).."
-            if song_points < 0:
-                song_points = 0
-        return song_points, message
-
-    for related_genre in related:
-        split_related = split_genre(related_genre)
+    if guess:
         if any(
             [
-                guess == related_genre,
-                split_guess == split_related,
-                "".join(split_guess) == "".join(split_related),
+                answer == guess,
+                split_answer == split_guess,
+                "".join(split_guess) == "".join(split_answer),
             ]
         ):
-            song_points = 100
-            message = "Close! You guessed a related genre!"
+            song_points = 750
+            message = "INSANE! You guessed the exact genre!"
             return song_points, message
 
-    for guess_part in split_guess:
+        correct_parts_count = sum(
+            guess_part in split_answer for guess_part in split_guess
+        )
+        if correct_parts_count:
+            part_percentage = correct_parts_count / len(split_answer)
+            song_points = int(500 * part_percentage)
+            message = f"NICE! You guessed {correct_parts_count} part(s) and {int(part_percentage * 100)}% of the genre correctly!"
+
+            if len(split_guess) - len(split_answer) > 0:
+                extra = len(split_guess) - len(split_answer)
+                song_points -= int(((500 / len(split_answer)) * extra) / 2)
+                message = message + f" {extra} extra word(s).."
+                if song_points < 0:
+                    song_points = 0
+            return song_points, message
+
         for related_genre in related:
-            if guess_part in split_genre(related_genre):
-                song_points = 50
-                message = (
-                    "You guessed part of a related genre. Here are some pity points."
-                )
+            split_related = split_genre(related_genre)
+            if any(
+                [
+                    guess == related_genre,
+                    split_guess == split_related,
+                    "".join(split_guess) == "".join(split_related),
+                ]
+            ):
+                song_points = 100
+                message = "Close! You guessed a related genre!"
                 return song_points, message
+
+        for guess_part in split_guess:
+            for related_genre in related:
+                if guess_part in split_genre(related_genre):
+                    song_points = 50
+                    message = "You guessed part of a related genre. Here are some pity points."
+                    return song_points, message
 
     song_points = 0
     message = [

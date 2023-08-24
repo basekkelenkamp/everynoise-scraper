@@ -1,4 +1,5 @@
 import json
+from unicodedata import name
 from dotenv import load_dotenv
 from os import getenv
 
@@ -11,7 +12,7 @@ pymysql.install_as_MySQLdb()
 load_dotenv()
 
 
-def get_connection():
+def get_connection(refresh=False):
     load_dotenv()
 
     connection = pymysql.connect(
@@ -22,6 +23,9 @@ def get_connection():
         ssl_verify_identity=True,
         ssl={"ca": getenv("PLANETSCALE_SSL_CERT_PATH")},
     )
+
+    if refresh:
+        return connection
 
     cursor = connection.cursor()
 
@@ -341,3 +345,48 @@ def update_party(
     query_params.append(party_code)
 
     cursor.execute(query_update_party, query_params)
+
+
+def increment_party_rounds_by_one(cursor: Cursor, party_code: str):
+    query_increment_rounds = "UPDATE party_games SET finished_rounds = finished_rounds + 1 WHERE party_code = %s"
+    cursor.execute(query_increment_rounds, [party_code])
+
+
+def get_last_updated_round_from_party_players(
+    cursor: Cursor, party_code: str, round_id: int
+):
+    players_data = []
+
+    # Get genre from the specified round_id
+    query_select_genre = "SELECT * FROM rounds WHERE id = %s"
+    cursor.execute(query_select_genre, [round_id])
+    host_round = Round(*cursor.fetchone())
+
+    # Get all players by party_code
+    query_select_players = "SELECT * FROM players WHERE party_code = %s"
+    cursor.execute(query_select_players, [party_code])
+    players = [Player(*player) for player in cursor.fetchall()]
+
+    for player in players:
+        query_select_rounds = """SELECT * FROM rounds WHERE player_id = %s AND genre = %s AND guess IS NOT NULL"""
+        cursor.execute(query_select_rounds, [player.id, host_round.genre])
+        rounds = [Round(*round_) for round_ in cursor.fetchall()]
+
+        last_updated_round = rounds[0]
+
+        # rare case if same genre appears
+        if len(rounds) > 1:
+            last_updated_round = max(rounds, key=lambda r: r.round_number)
+
+        player_info = {
+            "round_guess": last_updated_round.guess,
+            "total_points": player.total_score,
+            "round_points": last_updated_round.points,
+            "player_name": player.name,
+        }
+        players_data.append(player_info)
+
+    return {
+        "players": players_data,
+        "answer": host_round.genre,
+    }

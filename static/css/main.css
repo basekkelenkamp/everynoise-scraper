@@ -162,6 +162,29 @@ button.coming-soon:hover {
     color: transparent;
 }
 
+button.beta {
+    position: relative;
+    overflow: hidden;
+}
+
+button.beta:hover::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: gray;
+    color: white;
+}
+
+button.beta:hover {
+    color: transparent;
+}
+
 @media (max-width: 768px) {
     header {
         flex-direction: column;
