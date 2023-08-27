@@ -1,6 +1,23 @@
 let audioPlayer = new Audio();
 audioPlayer.crossOrigin = "anonymous";
 
+audioPlayer.addEventListener('ended', function() {
+    let play = document.getElementById("player-button");
+    play.src = 'static/images/play.png';
+    playing = false;
+});
+
+function handleVolumeChange(e) {
+    if (e.target.id === 'volume-slider') {
+        const volume = e.target.value;
+        document.cookie = `preferredVolume=${volume}; max-age=31536000; path=/`; // expires after 1 year
+    }
+}
+
+document.addEventListener('mouseup', handleVolumeChange);
+document.addEventListener('touchend', handleVolumeChange);
+
+
 let playing = false;
 let artistUrl;
 let context = new (window.AudioContext || window.webkitAudioContext)();
@@ -12,15 +29,33 @@ window.onload = function() {
     let d = document.getElementById("audioSelector");
     artistUrl = d.dataset.artisturl;
     console.log(artistUrl);
+
+    const savedVolume = getCookie('preferredVolume');
+    if (savedVolume) {
+        const volumeSlider = document.getElementById('volume-slider');
+        volumeSlider.value = savedVolume;
+        updateVolume(savedVolume);
+    }
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+function updateVolume(value) {
+    const minVolume = 0.01;
+    const maxVolume = 1;
+    const scaledVolume = (value / 100) * (Math.log(maxVolume / minVolume)) + Math.log(minVolume);
+    audioPlayer.volume = Math.exp(scaledVolume);
 }
 
 let volume = document.getElementById('volume-slider');
 volume.addEventListener("input", function(e) {
-    let minVolume = 0.01;  // To avoid Math.log(0)
-    let maxVolume = 1;
-    let scaledVolume = (e.currentTarget.value / 100) * (Math.log(maxVolume / minVolume)) + Math.log(minVolume);
-    audioPlayer.volume = Math.exp(scaledVolume);
+    updateVolume(e.currentTarget.value);
 });
+
 
 function audioHandler() {
     let play = document.getElementById("player-button");
