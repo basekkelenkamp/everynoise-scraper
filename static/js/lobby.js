@@ -44,6 +44,15 @@ function getPlayerData() {
     return playersData;
 }
 
+function generatePartyLink(code) {
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+    const baseUrl = port ? `${hostname}:${port}` : `${hostname}`;
+    const fullUrl = `${baseUrl}/join_party/${code}`;
+
+    return [baseUrl, fullUrl]
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const readyToggleButton = document.querySelector('.ready-toggle-button');
     const playerNameInput = document.querySelector('.player-name-input');
@@ -53,7 +62,35 @@ document.addEventListener("DOMContentLoaded", function() {
     const selfPlayerSlotInput = selfPlayerSlotDiv.querySelector('.player-name');
     const submitButton = document.getElementById('submit_button');
     const partyForm = document.querySelector('.party-form');
+    const partyCodeInput = document.getElementById('party_code');
+    const partyCode = document.getElementById('party_code').value;
 
+    const [baseUrl, partyUrl] = generatePartyLink(partyCode)
+    
+    partyCodeInput.value = partyUrl
+  
+
+    partyCodeInput.addEventListener('click', async () => {
+        // Copy to clipboard
+        navigator.clipboard.writeText(partyCodeInput.value).then(() => {
+          // Show pop-up message
+          const popup = document.createElement('div');
+          popup.textContent = 'Copied to clipboard';
+          popup.classList.add('popup');
+    
+          document.body.appendChild(popup);
+    
+          // Fade out and remove the popup
+          setTimeout(() => {
+            popup.style.opacity = '0';
+          }, 1000);
+    
+          setTimeout(() => {
+            document.body.removeChild(popup);
+          }, 2000);
+        });
+      });
+    
 
     function setReadyState(button) {
         button.classList.add('active');
@@ -65,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
         if (isHost) {
             selfPlayerSlotInput.value += " (host)"
+            checkPlayerStatusForButton()
         }
         if (warningMessage) {
             warningMessage.style.display = 'none';
@@ -77,6 +115,10 @@ document.addEventListener("DOMContentLoaded", function() {
         button.innerText = 'Not Ready';
         selfPlayerSlotDiv.classList.remove('ready');
         playerNameInput.readOnly = false;
+
+        if (isHost) {
+            checkPlayerStatusForButton()
+        }
     }
 
     function checkPlayerStatusForButton() {
@@ -139,7 +181,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const pusherKey = document.getElementById('pusher-key').value;
     const isHost = document.getElementById('is-host').value === 'True' ? true : false;
-    const partyCode = document.getElementById('party_code').value;
     const playerId = document.getElementById('player-id').value;
 
     console.log("player_id", playerId)
@@ -233,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             if (data.redirect_url) {
                 setTimeout(function() {
-                    redirectWithPost(data.redirect_url);
+                    redirectWithPost();
                 }, delay);    
             }
         })
@@ -244,16 +285,17 @@ document.addEventListener("DOMContentLoaded", function() {
     
     }
 
-    function redirectWithPost(url) {
+    function redirectWithPost() {
         console.log("redirect with post");
     
         // Create a form dynamically
-        const form = document.createElement('form');
-        form.method = 'post';
-        form.action = url;
+        // const form = document.createElement('form');
+        // form.method = 'post';
+        // form.action = url;
     
-        document.body.appendChild(form);
-        form.submit();
+        // document.body.appendChild(form);
+        // form.submit();
+        window.location.href = '/guess';
     }
     
     function broadcastClientChange() {

@@ -132,3 +132,18 @@
 #submit_button[disabled="false"]:hover {
     cursor: pointer;
 }
+
+
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    border-radius: 4px;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 1s ease;
+  }
+  

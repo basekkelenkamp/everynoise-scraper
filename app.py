@@ -311,9 +311,12 @@ def create_party():
     return resp
 
 
+@app.route("/join_party/<party_code>", methods=["GET"])
 @app.route("/join_party", methods=["POST"])
-def join_party():
-    party_code = request.form.get("party_code")
+def join_party(party_code=None):
+
+    if request.method == "POST":
+        party_code = request.form.get("party_code")
 
     if not party_code:
         return render_template("party/party.html")
