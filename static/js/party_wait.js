@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const channel = pusher.subscribe(`presence-${partyCode}`)
 
     let playersWaiting = 0;
+    let roundReadyTimeout;
+    let forceStartAfterSeconds = 120;
 
     // When self joins
     channel.bind("pusher:subscription_succeeded", (members) => {
@@ -31,9 +33,14 @@ document.addEventListener("DOMContentLoaded", function() {
         pWaitingPlayers.textContent = `Waiting for ${totalPlayers - playersWaiting} player(s)`
         
         if (playersWaiting === totalPlayers && isHost) {
-            roundReadyState()
+            roundReadyState();
+        } else if (isHost) {
+            // Start the 120-second timer
+            roundReadyTimeout = setTimeout(() => {
+                roundReadyState();
+            }, forceStartAfterSeconds * 1000);
         }
-    });
+        });
 
     // When another player joins
     channel.bind('pusher:member_added', (member) => {
@@ -43,8 +50,9 @@ document.addEventListener("DOMContentLoaded", function() {
         pWaitingPlayers.textContent = `Waiting for ${totalPlayers - playersWaiting} player(s)`
 
         if (playersWaiting === totalPlayers && isHost) {
-            roundReadyState()
-        }
+            clearTimeout(roundReadyTimeout);
+            roundReadyState();
+            }
 
     });
 
