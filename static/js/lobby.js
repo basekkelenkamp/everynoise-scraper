@@ -79,36 +79,30 @@ document.addEventListener("DOMContentLoaded", function() {
         playerNameInput.readOnly = false;
     }
 
-    if (submitButton) {
-        submitButton.addEventListener('mouseover', function() {
-    
-            const allPlayerSlots = Array.from(playerSlotsContainer.querySelectorAll('.player-slot:not(.empty)'));
-    
-            if (allPlayerSlots.length > 1 && allPlayerSlots.length < 7) {
-                const allPlayersReady = allPlayerSlots.every(slot => slot.classList.contains('ready'));
-            
-                if (allPlayersReady) {
-                    console.log("all players ready")
-                    this.disabled = false;
-                } else {
-                    this.disabled = true;
-                }
-            } else {
-                this.disabled = true;
-            }
-            
-            if (this.disabled) {
-                this.dataset.originalText = this.textContent;
-                this.textContent = 'WAIT ON READY';
-            }
-        });
-
-        submitButton.addEventListener('mouseout', function() {
-            this.textContent = "START GAME";
-        });
-    }
+    function checkPlayerStatusForButton() {
+        const allPlayerSlots = Array.from(playerSlotsContainer.querySelectorAll('.player-slot:not(.empty)'));
+        
+        if (allPlayerSlots.length > 1 && allPlayerSlots.length < 7) {
+          const allPlayersReady = allPlayerSlots.every(slot => slot.classList.contains('ready'));
+        
+          if (allPlayersReady) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'START GAME';
+            submitButton.style.backgroundColor = 'white';
+          } else {
+            submitButton.disabled = true;
+            submitButton.textContent = 'WAIT ON READY';
+            submitButton.style.backgroundColor = 'gray';
+          }
+        } else {
+          submitButton.disabled = true;
+          submitButton.textContent = 'WAIT ON READY';
+          submitButton.style.backgroundColor = 'gray';
+        }
+      }
 
     partyForm.addEventListener('submit', function(event) {
+        console.log("submit button")
         event.preventDefault();
         const playerData = getPlayerData()
         if (isHost) {
@@ -165,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function() {
         addPlayerSlot(member.id)
         if (isHost) {
             broadcastAllPlayersInfo()
+            checkPlayerStatusForButton()
         }
     });
 
@@ -172,12 +167,20 @@ document.addEventListener("DOMContentLoaded", function() {
     channel.bind('pusher:member_removed', (member) => {
         console.log("member removed!")
         removePlayerFromSlot(member.id);
+
+        if (isHost) {
+            checkPlayerStatusForButton()
+        }
     });
 
     // Handle a client change (name or ready status change)
     channel.bind(CLIENTCHANGE_NAME, (data) => {
         console.log(CLIENTCHANGE_NAME)
         updatePlayerSlot(data.playerId, data.playerName, data.status);
+
+        if (isHost) {
+            checkPlayerStatusForButton()
+        }
     });
 
     // Handle updates to all player slots
