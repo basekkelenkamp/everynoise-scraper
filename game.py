@@ -64,11 +64,11 @@ def _calculate_points(guess: str, answer_list: list, related: list):
 
                 if len(split_guess) - len(split_answer) > 0:
                     extra = len(split_guess) - len(split_answer)
-                    song_points -= int(((500 / len(split_answer)) * extra) / 2)
+                    answer_points[-1] -= int(((500 / len(split_answer)) * extra) / 2)
                     answer_messages[-1] = (
                         answer_messages[-1] + f" {extra} extra word(s).."
                     )
-                    if song_points < 0:
+                    if answer_points[-1] < 0:
                         answer_points[-1] = 0
 
             if answer_points and any(answer_points) > 0:
