@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/about.css') }}" crossorigin="anonymous">
+
+<div class="main-wrapper">
+  <h2>About</h2>
+
+  <div class="info-wrapper">
+    <p>Hello, I'm Bas! This is a passion project that I built purely out of my own pocket, because of my love for music and coding. If you wish to help me continue to work on updates and build new cool things, consider donating a coffee :)</p>
+    <script class="coffee" type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="basekkel" data-color="#5F7FFF" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+  </div>
+
+  <div class="info-wrapper">
+    <p>Data is powered by <a class="link" href="https://everynoise.com/" target="_blank">Every Noise At Once</a>.</p>
+    <p>You get rewarded points for guessing:<br>
+    1. The right genre (+750)<br>
+    2. The right genre partially (+500 * the percentage of correct words)<br>
+    3. A related genre (+100)<br>
+    4. Part of a related genre (+50)<br>
+    </p>
+  </div>
+
+  <div class="social-wrapper">
+    <p><a href="https://www.basthecreativetechnologist.com" class="social-button" target="_blank">website</a></p>
+    <p><a href="https://www.linkedin.com/in/bas-ekkelenkamp-a83903166/" class="social-button"target="_blank">linkedin</a></p>
+    <p><a href="https://www.instagram.com/_333ak_/" class="social-button" target="_blank">instagram</a></p>
+  </div>
+
+</div>
+
+{% endblock content %}

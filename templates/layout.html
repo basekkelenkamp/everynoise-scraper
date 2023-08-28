@@ -11,7 +11,10 @@
     <header>
         <h1><a class="header-link" href="{{ url_for('index') }}">Genre guesser</a></h1>
         <div class="icon-container">
-            <a class="header-link" href="{{ url_for('leaderboards') }}">leaderboards</a>
+            <a class="header-link" href="{{ url_for('leaderboards') }}">Leaderboards</a>
+        </div>
+        <div class="icon-container">
+            <a class="header-link" href="{{ url_for('about') }}">About</a>
         </div>
     </header>
     <div>{% block content %}{% endblock %}</div>

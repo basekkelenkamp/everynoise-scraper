@@ -74,6 +74,11 @@ def index():
     return render_template("main/index.html", round_types=ROUND_TYPES)
 
 
+@app.route("/about")
+def about():
+    return render_template("main/about.html")
+
+
 @app.route("/create_game", methods=["POST"])
 def create_game():
     round_type = "5"
