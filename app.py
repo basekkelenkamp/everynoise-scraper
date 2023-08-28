@@ -32,11 +32,15 @@ from database.mysql_db import (
 from everynoise_scraper import scrape_artist_page
 from game import Game, Player, submit_guess, split_genre
 from utils.pusher import get_pusher_key, init_pusher
+from flask_cachebuster import CacheBuster
 
 
 app = Flask(__name__)
 
-# db = get_connection(refresh=False)
+config = { 'extensions': ['.js', '.css', '.csv'], 'hash_size': 5 }
+cache_buster = CacheBuster(config=config)
+cache_buster.init_app(app)
+
 game = Game()
 pusher = init_pusher()
 
