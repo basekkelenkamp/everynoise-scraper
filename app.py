@@ -174,6 +174,7 @@ def answer():
             render_template(
                 "party/party_wait.html",
                 guess=answer_dict["guess"],
+                message=answer_dict["message"],
                 player_id=str(player.id),
                 total_players=total_players,
                 is_host=is_host,
@@ -442,13 +443,16 @@ def get_round_party_data():
 def party_round_answer():
     data = request.form
     answer = data.get("answer")
+    message = data.get("message")
+    artist = data.get("artist")
+    artist_link = data.get("artist_link")
     party_code = request.cookies.get("party_code")
 
     players_data = []
     current_player = {}
 
     for k, value in data.items():
-        if k == "answer":
+        if k in ["answer", "message", "artist", "artist_link"]:
             continue
 
         player_name, key = k.split(".")
@@ -489,6 +493,9 @@ def party_round_answer():
             "party/party_answer.html",
             players_data=sorted_players_data,
             answer=answer,
+            message=message,
+            artist=artist,
+            artist_link=artist_link,
             end=end,
         )
     )

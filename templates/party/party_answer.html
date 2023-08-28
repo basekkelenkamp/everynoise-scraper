@@ -8,7 +8,8 @@
 <div class="main-wrapper">
     
     <h2>Answer: {{ answer }}</h2>
-    
+    <p>{{ message }}</p>
+
     <div class="scores">
         <ul>
             {% for player in players_data %}    
@@ -22,6 +23,14 @@
                 {% endfor %}
         </ul>
     </div>
+
+    <div class="artist-info-wrapper">
+        <div class="answer-info-wrapper">
+            <p>Artist: {{ artist }}</p>
+            <a href="https://everynoise.com/{{ artist_link }}" target="_blank" class="game-button discover-button">Discover the artist</a>
+        </div>
+    </div>
+
 
     {% if end %}
         <form method="GET" action="{{ url_for('party') }}">

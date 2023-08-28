@@ -389,4 +389,6 @@ def get_last_updated_round_from_party_players(
     return {
         "players": players_data,
         "answer": host_round.genre,
+        "artist": last_updated_round.artist_name,
+        "artist_link": last_updated_round.artist_spotify,
     }

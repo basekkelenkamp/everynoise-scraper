@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const partyCode = document.getElementById('party-code').value;
     const pusherKey = document.getElementById('pusher-key').value;
+    const message = document.getElementById('message').value;
 
     const playerId = document.getElementById("player-id").value
     const roundId = document.getElementById("round-id").value
@@ -110,7 +111,28 @@ document.addEventListener("DOMContentLoaded", function() {
         answerInput.name = 'answer';
         answerInput.value = data.answer;
         form.appendChild(answerInput);
-    
+
+        // Add the 'message' data
+        const messageInput = document.createElement('input');
+        messageInput.type = 'hidden';
+        messageInput.name = 'message';
+        messageInput.value = message;
+        form.appendChild(messageInput);
+
+        // Add the 'artist' data
+        const artistInput = document.createElement('input');
+        artistInput.type = 'hidden';
+        artistInput.name = 'artist';
+        artistInput.value = data.artist;
+        form.appendChild(artistInput);
+
+        // Add the 'artist_link' data
+        const artist_linkInput = document.createElement('input');
+        artist_linkInput.type = 'hidden';
+        artist_linkInput.name = 'artist_link';
+        artist_linkInput.value = data.artist_link;
+        form.appendChild(artist_linkInput);
+        
         // Add the player data as hidden inputs with IDs based on player names
         for (const player of data.players) {
             const playerName = player.player_name;  // Extract player's name
