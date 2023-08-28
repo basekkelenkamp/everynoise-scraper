@@ -25,7 +25,7 @@
     {% endif %} {% if end %}
     <form class="submit-score-form" method="POST" action="{{ url_for('submit_score') }}">
         <input type="text" name="name" placeholder="name.." required/>
-        <input class="game-button" type="submit" name="submit_score" value="submit_score" />
+        <input class="game-button" type="submit" name="submit_score" value="submit_score" maxlength="15"/>
     </form>
     {% endif %}
 

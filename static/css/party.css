@@ -147,3 +147,19 @@
     transition: opacity 1s ease;
   }
   
+  #party_code {
+    width: 75%;
+    background-color: transparent;
+    color: inherit;
+    text-align: center;
+    font-size: 110%;
+    border: 2px solid rgba(0, 255, 0, 0.5);  /* Adds a slightly green outline */
+    border-radius: 0.3rem;  /* Similar to other elements */
+    padding: 0.75em;  /* Similar to other inputs */
+}
+
+/* Optional: Hover effect to indicate it's clickable */
+#party_code:hover {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+    cursor: pointer;
+}

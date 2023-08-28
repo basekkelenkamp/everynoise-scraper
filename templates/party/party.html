@@ -4,19 +4,19 @@
 <div class="main-wrapper">
 
     <form class="party-form" method="POST" action="{{ url_for('create_party') }}">
-        <p>Create a party and send your unique party code to up to 6 friends!</p>
+        <p>Create a party and send your unique party link to up to 6 friends!</p>
         <div class="menu-item-wrapper create-party-button">
             <button type="submit" id="submit_button" name="submit_button">CREATE PARTY</button>
         </div>
     </form>
 
-    <form class="party-form" method="POST" action="{{ url_for('join_party') }}">
+    <!-- <form class="party-form" method="POST" action="{{ url_for('join_party') }}">
         <p>Connect to a friend's party!</p>
         <input type="text" id="party_code" name="party_code" placeholder="insert party code..">
         <div class="menu-item-wrapper create-party-button">
             <button type="submit" id="submit_button" name="submit_button">JOIN PARTY</button>
         </div>
-    </form>
+    </form> -->
 
 </div>
 {% endblock content %}
