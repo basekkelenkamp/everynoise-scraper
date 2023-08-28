@@ -5,7 +5,7 @@ import requests
 from pandas import Series
 
 from database.models import Round
-from everynoise_scraper import scrape_all_genres, scrape_genre_page
+from everynoise_scraper import scrape_all_genres, scrape_artist_page, scrape_genre_page
 from dataclasses import dataclass
 from uuid import uuid4
 import re
@@ -32,37 +32,48 @@ def split_genre(genre) -> list:
     return sorted(set(re.split(r"[ -]", genre)))
 
 
-def _calculate_points(guess: str, answer: str, related: list):
+def _calculate_points(guess: str, answer_list: list, related: list):
+
     split_guess = split_genre(guess)
-    split_answer = split_genre(answer)
+    split_answer_list = [split_genre(answer) for answer in answer_list]
 
     if guess:
-        if any(
-            [
-                answer == guess,
-                split_answer == split_guess,
-                "".join(split_guess) == "".join(split_answer),
-            ]
-        ):
-            song_points = 750
-            message = "INSANE! You guessed the exact genre!"
-            return song_points, message
+        answer_points = []
+        answer_messages = []
+        for (answer, split_answer) in zip(answer_list, split_answer_list):
+            if any(
+                [
+                    answer == guess,
+                    split_answer == split_guess,
+                    "".join(split_guess) == "".join(split_answer),
+                ]
+            ):
+                song_points = 750
+                message = "INSANE! You guessed the exact genre!"
+                return song_points, message
 
-        correct_parts_count = sum(
-            guess_part in split_answer for guess_part in split_guess
-        )
-        if correct_parts_count:
-            part_percentage = correct_parts_count / len(split_answer)
-            song_points = int(500 * part_percentage)
-            message = f"NICE! You guessed {correct_parts_count} part(s) and {int(part_percentage * 100)}% of the genre correctly!"
+            correct_parts_count = sum(
+                guess_part in split_answer for guess_part in split_guess
+            )
+            if correct_parts_count:
+                part_percentage = correct_parts_count / len(split_answer)
+                answer_points.append(int(500 * part_percentage))
+                answer_messages.append(
+                    f"NICE! You guessed {correct_parts_count} part(s) and {int(part_percentage * 100)}% of the genre correctly!"
+                )
 
-            if len(split_guess) - len(split_answer) > 0:
-                extra = len(split_guess) - len(split_answer)
-                song_points -= int(((500 / len(split_answer)) * extra) / 2)
-                message = message + f" {extra} extra word(s).."
-                if song_points < 0:
-                    song_points = 0
-            return song_points, message
+                if len(split_guess) - len(split_answer) > 0:
+                    extra = len(split_guess) - len(split_answer)
+                    song_points -= int(((500 / len(split_answer)) * extra) / 2)
+                    answer_messages[-1] = (
+                        answer_messages[-1] + f" {extra} extra word(s).."
+                    )
+                    if song_points < 0:
+                        answer_points[-1] = 0
+
+            if answer_points and any(answer_points) > 0:
+                max_points = max(answer_points)
+                return max_points, answer_messages[answer_points.index(max_points)]
 
         for related_genre in related:
             split_related = split_genre(related_genre)
@@ -110,7 +121,7 @@ def init_new_player() -> Player:
 
 def submit_guess(round_: Round):
 
-    answer: str = round_.genre.lower()
+    answer: list = [genre.lower() for genre in round_.genre]
     related: list = [genre.lower() for genre in json.loads(round_.related_genres)]
 
     points, message = _calculate_points(round_.guess.lower(), answer, related)
@@ -175,8 +186,10 @@ class Game:
             if not random_artist["preview_url"]:
                 continue
 
+            # artist_genres = scrape_artist_page(random_artist["spotify_link"])
+
             print(f"Listen: {random_artist['preview_url']}")
-            print(real_genre)
+            print("genre:", real_genre)
             print(related_genres)
 
             rounds.append((random_artist, real_genre, related_genres))

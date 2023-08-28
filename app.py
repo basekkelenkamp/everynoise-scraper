@@ -29,6 +29,7 @@ from database.mysql_db import (
     get_player_by_id,
     get_all_rounds_from_player,
 )
+from everynoise_scraper import scrape_artist_page
 from game import Game, Player, submit_guess, split_genre
 from utils.pusher import get_pusher_key, init_pusher
 
@@ -57,7 +58,6 @@ def generate_player_rounds(player: Player, round_type="5"):
 
     db = get_connection(refresh=True)
     cursor = db.cursor()
-    # cursor.connection.ping(reconnect=True)
 
     for round_ in rounds_data:
         (artist, genre, related_genres) = round_
@@ -141,7 +141,13 @@ def answer():
         return redirect(url_for("index"))
 
     round_.guess = request.form.get("genre_guess")
+
+    main_genres = scrape_artist_page(round_.artist_spotify)
+    print(main_genres)
+
+    round_.genre = main_genres
     round_.points, message = submit_guess(round_)
+    round_.genre = ", ".join(main_genres)
 
     if not round_.guess:
         round_.guess = "skipped"

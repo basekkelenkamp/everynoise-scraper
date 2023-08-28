@@ -1,4 +1,6 @@
+from asyncio.format_helpers import _get_function_source
 import os
+from sys import builtin_module_names
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -62,3 +64,14 @@ def scrape_genre_page(genre: Series):
     )
     real_genre = match.group(1)
     return artists_df, real_genre, related_genres
+
+
+def scrape_artist_page(artist_link: str):
+    url = base_url + artist_link
+    artist_page = requests.get(url)
+
+    soup = BeautifulSoup(artist_page.content, "html.parser")
+    genres_div = soup.find("div", {"class": "genres"})
+    genre_links = genres_div.find_all("a")
+    print(genre_links)
+    return [link.text for link in genre_links]
