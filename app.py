@@ -146,13 +146,7 @@ def answer():
         return redirect(url_for("index"))
 
     round_.guess = request.form.get("genre_guess")
-
-    main_genres = scrape_artist_page(round_.artist_spotify)
-    print(main_genres)
-
-    round_.genre = main_genres
     round_.points, message = submit_guess(round_)
-    round_.genre = ", ".join(main_genres)
 
     if not round_.guess:
         round_.guess = "skipped"

@@ -121,7 +121,11 @@ def init_new_player() -> Player:
 
 def submit_guess(round_: Round):
 
-    answer: list = [genre.lower() for genre in round_.genre]
+    if isinstance(round_.genre, str):
+        answer: list = [round_.genre.lower()]
+    else:
+        answer: list = [genre.lower() for genre in [round_.genre]]
+
     related: list = [genre.lower() for genre in json.loads(round_.related_genres)]
 
     points, message = _calculate_points(round_.guess.lower(), answer, related)
