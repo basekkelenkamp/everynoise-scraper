@@ -279,20 +279,6 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
-name = "flask-cachebuster"
-version = "1.0.0"
-description = "Flask-CacheBuster is a lightweight Flask extension that adds a hash to the URL query parameters of each static file."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "Flask-CacheBuster-1.0.0.tar.gz", hash = "sha256:0c8d7b57db8953f5c5875153f16cb970c2ed5a681b39326613c822f0c9764ec8"},
-]
-
-[package.dependencies]
-Flask = "*"
-
-[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -825,4 +811,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "8dc5824ab44161571c859e4d6f29615f295874ddbce2a56aae8e8d8bce456278"
+content-hash = "d3eb932209455c5c52466b0bcf23f0d672604e4041a7403aa218729a6b7df578"
