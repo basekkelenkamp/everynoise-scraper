@@ -48,7 +48,7 @@ function generatePartyLink(code) {
     const hostname = window.location.hostname;
     const port = window.location.port;
     const baseUrl = port ? `${hostname}:${port}` : `${hostname}`;
-    const fullUrl = `${baseUrl}/join_party/${code}`;
+    const fullUrl = `https://${baseUrl}/join_party/${code}`;
 
     return [baseUrl, fullUrl]
 }

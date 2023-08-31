@@ -371,6 +371,10 @@ def get_last_updated_round_from_party_players(
         query_select_rounds = """SELECT * FROM rounds WHERE player_id = %s AND genre = %s AND guess IS NOT NULL"""
         cursor.execute(query_select_rounds, [player.id, host_round.genre])
         rounds = [Round(*round_) for round_ in cursor.fetchall()]
+        
+        if not rounds:
+            print(player)
+            continue
 
         last_updated_round = rounds[0]
 
