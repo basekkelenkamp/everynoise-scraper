@@ -227,6 +227,18 @@ def remove_player_by_name(cursor: Cursor, player):
     cursor.execute(query_delete_player, [player_obj.id])
 
 
+def remove_player_by_id(cursor: Cursor, player_id: str):
+    query_select_player = """SELECT * FROM players WHERE id = %s"""
+    cursor.execute(query_select_player, [player_id])
+    player_obj = Player(*cursor.fetchone())
+
+    query_delete_rounds = """DELETE FROM rounds WHERE player_id = %s"""
+    cursor.execute(query_delete_rounds, [player_obj.id])
+
+    query_delete_player = """DELETE FROM players WHERE id = %s"""
+    cursor.execute(query_delete_player, [player_obj.id])
+
+
 def remove_empty_names(cursor: Cursor):
     query_select_empty = """SELECT * FROM players WHERE name is NULL OR name = ''"""
     cursor.execute(query_select_empty)
@@ -352,6 +364,12 @@ def increment_party_rounds_by_one(cursor: Cursor, party_code: str):
     cursor.execute(query_increment_rounds, [party_code])
 
 
+def get_party_players(cursor: Cursor, party_code: str):
+    query_select_players = "SELECT * FROM players WHERE party_code = %s"
+    cursor.execute(query_select_players, [party_code])
+    return [Player(*player) for player in cursor.fetchall()]
+
+
 def get_last_updated_round_from_party_players(
     cursor: Cursor, party_code: str, round_id: int
 ):
@@ -363,15 +381,13 @@ def get_last_updated_round_from_party_players(
     host_round = Round(*cursor.fetchone())
 
     # Get all players by party_code
-    query_select_players = "SELECT * FROM players WHERE party_code = %s"
-    cursor.execute(query_select_players, [party_code])
-    players = [Player(*player) for player in cursor.fetchall()]
+    players = get_party_players(cursor, party_code)
 
     for player in players:
         query_select_rounds = """SELECT * FROM rounds WHERE player_id = %s AND genre = %s AND guess IS NOT NULL"""
         cursor.execute(query_select_rounds, [player.id, host_round.genre])
         rounds = [Round(*round_) for round_ in cursor.fetchall()]
-        
+
         if not rounds:
             print(player)
             continue

@@ -15,11 +15,13 @@ from database.mysql_db import (
     get_first_player_by_party_code,
     get_last_updated_round_from_party_players,
     get_party_by_party_code,
+    get_party_players,
     get_player_by_cookie,
     increment_party_rounds_by_one,
     insert_party,
     insert_round,
     get_round_by_id,
+    remove_player_by_id,
     update_party,
     update_round,
     update_player,
@@ -408,6 +410,12 @@ def initialize_party():
         update_party(
             cursor, party_code=party_code, game_started=True, total_players=len(players)
         )
+
+        players_data = get_party_players(cursor, party_code)
+        for player in players_data:
+            player_id = str(player.id)
+            if player_id not in players:
+                remove_player_by_id(cursor, player_id)
 
         for player_id, player_name in players.items():
             update_player_name(cursor, player_id, player_name)
