@@ -17,6 +17,7 @@ from database.mysql_db import (
     get_party_by_party_code,
     get_party_players,
     get_player_by_cookie,
+    get_player_rank_and_score_by_id,
     increment_party_rounds_by_one,
     insert_party,
     insert_round,
@@ -163,6 +164,10 @@ def answer():
     update_player(cursor, player, round_.points)
 
     end = 0 == len(get_all_rounds_from_player(cursor, player.id, empty_guess_only=True))
+    ranking, total_score = None, None
+
+    if end:
+        ranking, total_score = get_player_rank_and_score_by_id(cursor, player.id)
 
     if party_code:
         is_host = True if request.cookies.get("is_host") else False
@@ -187,7 +192,13 @@ def answer():
     else:
         # unpacking: rounds, points, guess, genre, artist, spotify_link, message
         resp = make_response(
-            render_template("main/answer.html", **answer_dict, end=end)
+            render_template(
+                "main/answer.html",
+                **answer_dict,
+                end=end,
+                ranking=ranking,
+                total_score=total_score
+            )
         )
         resp.set_cookie("round_id", expires=0)
 

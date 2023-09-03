@@ -138,6 +138,24 @@ def get_round_by_id(cursor: Cursor, id_: int):
     return Round(*cursor.fetchone())
 
 
+def get_player_rank_and_score_by_id(cursor: Cursor, player_id: int):
+    query_select_player_ranking = """
+    SELECT total_score, ranking FROM (
+        SELECT id, total_score, RANK() OVER (ORDER BY total_score DESC) as ranking
+        FROM players
+    ) as ranked_players
+    WHERE id = %s
+    """
+    cursor.execute(query_select_player_ranking, [player_id])
+    result = cursor.fetchone()
+
+    if result:
+        total_score, ranking = result
+        return ranking, total_score
+    else:
+        return None, None
+
+
 def insert_round(
     cursor: Cursor, player: Player, related_genres: list, genre: str, artist: dict
 ):
