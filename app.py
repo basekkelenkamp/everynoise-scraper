@@ -172,6 +172,10 @@ def answer():
     if party_code:
         is_host = True if request.cookies.get("is_host") else False
 
+        print(
+            f"{player.name}. isHost:{is_host}, guess:{round_.guess}, points:{round_.points}, round_num:{player.total_rounds}"
+        )
+
         total_players = None
         party = get_party_by_party_code(cursor, party_code)
         total_players = party.total_players
@@ -197,7 +201,7 @@ def answer():
                 **answer_dict,
                 end=end,
                 ranking=ranking,
-                total_score=total_score
+                total_score=total_score,
             )
         )
         resp.set_cookie("round_id", expires=0)
