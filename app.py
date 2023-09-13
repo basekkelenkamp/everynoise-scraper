@@ -364,7 +364,7 @@ def join_party(party_code=None):
             "preview_url": round_.artist_preview_url,
         }
         round_id = insert_round(
-            cursor, player, round_.related_genres, round_.genre, artist_dict
+            cursor, player, json.loads(round_.related_genres), round_.genre, artist_dict
         )
         print(round_id)
 

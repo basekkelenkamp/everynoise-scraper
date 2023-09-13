@@ -1,4 +1,5 @@
 import json
+from platform import release
 from random import randint, choice
 import pandas as pd
 import requests
@@ -32,48 +33,47 @@ def split_genre(genre) -> list:
     return sorted(set(re.split(r"[ -]", genre)))
 
 
-def _calculate_points(guess: str, answer_list: list, related: list):
+def _calculate_points(guess: str, answer: str, related: list):
 
     split_guess = split_genre(guess)
-    split_answer_list = [split_genre(answer) for answer in answer_list]
+    split_answer = split_genre(answer)
 
     if guess:
+        # print(f"\nguess: {guess} | {split_guess}. answer: {answer} | {split_answer}\n")
+        # print(f"\nrelated: {related}\n")
         answer_points = []
         answer_messages = []
-        for (answer, split_answer) in zip(answer_list, split_answer_list):
-            if any(
-                [
-                    answer == guess,
-                    split_answer == split_guess,
-                    "".join(split_guess) == "".join(split_answer),
-                ]
-            ):
-                song_points = 750
-                message = "INSANE! You guessed the exact genre!"
-                return song_points, message
+        if any(
+            [
+                answer == guess,
+                split_answer == split_guess,
+                "".join(split_guess) == "".join(split_answer),
+            ]
+        ):
+            song_points = 750
+            message = "INSANE! You guessed the exact genre!"
+            return song_points, message
 
-            correct_parts_count = sum(
-                guess_part in split_answer for guess_part in split_guess
+        correct_parts_count = sum(
+            guess_part in split_answer for guess_part in split_guess
+        )
+        if correct_parts_count:
+            part_percentage = correct_parts_count / len(split_answer)
+            answer_points.append(int(500 * part_percentage))
+            answer_messages.append(
+                f"NICE! You guessed {correct_parts_count} part(s) and {int(part_percentage * 100)}% of the genre correctly!"
             )
-            if correct_parts_count:
-                part_percentage = correct_parts_count / len(split_answer)
-                answer_points.append(int(500 * part_percentage))
-                answer_messages.append(
-                    f"NICE! You guessed {correct_parts_count} part(s) and {int(part_percentage * 100)}% of the genre correctly!"
-                )
 
-                if len(split_guess) - len(split_answer) > 0:
-                    extra = len(split_guess) - len(split_answer)
-                    answer_points[-1] -= int(((500 / len(split_answer)) * extra) / 2)
-                    answer_messages[-1] = (
-                        answer_messages[-1] + f" {extra} extra word(s).."
-                    )
-                    if answer_points[-1] < 0:
-                        answer_points[-1] = 0
+            if len(split_guess) - len(split_answer) > 0:
+                extra = len(split_guess) - len(split_answer)
+                answer_points[-1] -= int(((500 / len(split_answer)) * extra) / 2)
+                answer_messages[-1] = answer_messages[-1] + f" {extra} extra word(s).."
+                if answer_points[-1] < 0:
+                    answer_points[-1] = 0
 
-            if answer_points and any(answer_points) > 0:
-                max_points = max(answer_points)
-                return max_points, answer_messages[answer_points.index(max_points)]
+        if answer_points and any(answer_points) > 0:
+            max_points = max(answer_points)
+            return max_points, answer_messages[answer_points.index(max_points)]
 
         for related_genre in related:
             split_related = split_genre(related_genre)
@@ -120,15 +120,13 @@ def init_new_player() -> Player:
 
 
 def submit_guess(round_: Round):
+    answer = round_.genre.lower()
+    guess = round_.guess.lower()
 
-    if isinstance(round_.genre, str):
-        answer: list = [round_.genre.lower()]
-    else:
-        answer: list = [genre.lower() for genre in [round_.genre]]
+    parsed_related = json.loads(round_.related_genres)
+    related: list = [genre.lower() for genre in parsed_related]
 
-    related: list = [genre.lower() for genre in json.loads(round_.related_genres)]
-
-    points, message = _calculate_points(round_.guess.lower(), answer, related)
+    points, message = _calculate_points(guess, answer, related)
     round_.points = points
 
     print(message)
