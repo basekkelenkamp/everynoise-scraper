@@ -10,6 +10,7 @@ from everynoise_scraper import scrape_all_genres, scrape_artist_page, scrape_gen
 from dataclasses import dataclass
 from uuid import uuid4
 import re
+from difflib import SequenceMatcher
 
 
 @dataclass
@@ -33,6 +34,10 @@ def split_genre(genre) -> list:
     return sorted(set(re.split(r"[ -]", genre)))
 
 
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
+
+
 def _calculate_points(guess: str, answer: str, related: list):
 
     split_guess = split_genre(guess)
@@ -54,9 +59,17 @@ def _calculate_points(guess: str, answer: str, related: list):
             message = "INSANE! You guessed the exact genre!"
             return song_points, message
 
-        correct_parts_count = sum(
-            guess_part in split_answer for guess_part in split_guess
-        )
+        # Checks if part of the genre is correct, and ALMOST correct (75% or higher)
+        correct_parts_count = 0
+        for guess_part in split_guess:
+            for answer_part in split_answer:
+                if (
+                    guess_part == answer_part
+                    or similar(guess_part, answer_part) >= 0.75
+                ):
+                    correct_parts_count += 1
+                    break
+
         if correct_parts_count:
             part_percentage = correct_parts_count / len(split_answer)
             answer_points.append(int(500 * part_percentage))
