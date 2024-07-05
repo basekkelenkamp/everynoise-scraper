@@ -13,6 +13,7 @@ Flask = "^2.2.2"
 python-dotenv = "^0.21.0"
 pymysql = "^1.0.2"
 pusher = "^3.3.2"
+supabase = "^2.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.10.0"
